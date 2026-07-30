@@ -39,6 +39,26 @@ for f in /path/to/masters/*.png; do
 done
 ```
 
+## Astrologer portrait
+
+`astrologer.jpg` (256 x 256 JPEG q85, ~14 KB) is the face beside the consult
+nudge, set via `astrologer.avatarUrl` in the config. It ships **pre-cropped
+square to the head** — the 1254 x 1254 master is mostly shoulders, which
+would leave the face tiny in a 48 px circle. Recrop from a new master with:
+
+```python
+from PIL import Image
+im = Image.open('master.png').convert('RGB')
+W, H = im.size
+side, top = 820, 70                      # tune so the eyes land ~40% down
+left = (W - side) // 2
+im.crop((left, top, left + side, top + side)).resize((256, 256), Image.LANCZOS) \
+  .save('public/art/astrologer.jpg', 'JPEG', quality=85, optimize=True, progressive=True)
+```
+
+If it 404s the client removes the `<img>` and the avatar degrades to a plain
+gold disc — never a broken-image icon.
+
 ## Notes
 
 - These illustrations carry **their own painted border**, so the client drops

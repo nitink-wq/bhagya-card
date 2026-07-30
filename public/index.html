@@ -221,8 +221,16 @@
 
   /* astrologer nudge — sits on the same open surface, only the bubble is tinted */
   .astro { display: flex; align-items: center; gap: 12px; margin-top: 26px; text-align: left; }
-  .astro .avatar { position: relative; width: 48px; height: 48px; flex: none; }
-  .astro .avatar svg, .astro .avatar img { width: 48px; height: 48px; border-radius: 50%; display: block; object-fit: cover; }
+  .astro .avatar {
+    position: relative; width: 48px; height: 48px; flex: none; border-radius: 50%;
+    background: linear-gradient(160deg, #FFD9A0 0%, var(--gold-mid) 100%);
+  }
+  .astro .avatar svg, .astro .avatar img {
+    width: 48px; height: 48px; border-radius: 50%; display: block;
+    /* the portrait ships pre-cropped square to the face, so cover is a
+       straight fit — no crop bias needed here */
+    object-fit: cover;
+  }
   .astro .avatar .live {
     position: absolute; right: 1px; bottom: 2px; width: 12px; height: 12px;
     border-radius: 50%; background: #2FBF57; box-shadow: 0 0 0 2.5px var(--cream);
@@ -308,9 +316,28 @@
   }
   .claimBar button:active { background: var(--cta-soft); }
   .claimBar button[disabled] { pointer-events: none; }
-  /* claimed is a resting state, not an event: the button just says so and
-     stops responding — no burst, no re-animation, nothing moves */
-  .claimBar button.claimed { background: rgba(53, 32, 15, .10); color: var(--ink-soft); box-shadow: none; }
+
+  /* Claiming is a one-shot celebration: coins fly out of the icon, then the
+     whole row folds away — once the coins are in the wallet there is nothing
+     left to act on, so the row earns its space back for the card. */
+  .coinFx {
+    position: absolute; width: 20px; height: 20px; z-index: 6; pointer-events: none;
+    animation: coinFly .9s cubic-bezier(.25, .9, .4, 1) forwards;
+  }
+  @keyframes coinFly {
+    0% { transform: translate(0, 0) scale(.4); opacity: 0; }
+    18% { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot)); opacity: 0; }
+  }
+  .claimBar.paid { overflow: hidden; animation: foldAway .42s .52s cubic-bezier(.4, 0, .2, 1) forwards; }
+  @keyframes foldAway {
+    0% { opacity: 1; max-height: 60px; margin-top: 11px; padding-top: 7px; padding-bottom: 7px; }
+    100% { opacity: 0; max-height: 0; margin-top: 0; padding-top: 0; padding-bottom: 0; transform: scale(.97); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .coinFx { display: none; }
+    .claimBar.paid { animation-duration: .01s; animation-delay: 0s; }
+  }
 
   /* ---- fallbacks ---------------------------------------------------------- */
   .errCard { text-align: center; background: var(--surface); border-radius: 22px; padding: 30px 22px; margin-top: 20px;
@@ -546,6 +573,16 @@
       (numeral ? '<span class="num">' + esc(numeral) + '</span>' : '') +
       '</div></div>';
   }
+  // The astrologer's portrait, when one is configured (astrologer.avatarUrl);
+  // otherwise the inline placeholder so the nudge never renders faceless.
+  function avatarHtml(s) {
+    var a = (s && s.astrologer) || {};
+    if (!a.avatarUrl) return AVATAR;
+    // If the portrait 404s, drop it — .avatar is a gold disc underneath, so a
+    // missing file degrades to a plain avatar rather than a broken-image icon.
+    return '<img src="' + esc(a.avatarUrl) + '" alt="' + esc(a.name || '') +
+      '" onerror="this.remove()">';
+  }
   function hasRealArt() { return Boolean(S && S.art && S.art.baseUrl); }
   function artFor(card) {
     var a = (S && S.art) || {};
@@ -641,16 +678,16 @@
       '</div>' +
       '<div class="track">' + track + '</div>';
 
-    if (r.amount > 0) {
+    // Only while the coins are still owed. Once claimed the row is gone for
+    // good — it has nothing left to say and the card should have the space.
+    if (r.claimable) {
       html += '<div class="claimBar" id="claimBar">' +
         '<div class="coinIcon">' + COIN_SVG + '</div>' +
         '<div class="txt">' +
           '<span class="lbl">' + esc(s.copy.claim.label) + '</span>' +
           '<span class="val">' + esc(fmt(s.copy.claim.coins, { amount: r.amount })) + '</span>' +
         '</div>' +
-        '<button id="claimBtn"' + (r.claimed ? ' class="claimed" disabled' : '') + '>' +
-          esc(r.claimed ? s.copy.claim.claimed : s.copy.claim.button) +
-        '</button>' +
+        '<button id="claimBtn">' + esc(s.copy.claim.button) + '</button>' +
         '</div>';
     }
     return html + '</div>';
@@ -676,7 +713,7 @@
         '<p class="insight">' + c.fortune.map(esc).join(' ') + '</p>' +
         (s.postStreak ? '<p class="note">' + esc(s.copy.postStreak) + '</p>' : '') +
         '<div class="astro">' +
-          '<div class="avatar">' + AVATAR + '<span class="live"></span></div>' +
+          '<div class="avatar">' + avatarHtml(s) + '<span class="live"></span></div>' +
           '<div class="bubble">' + esc(c.consultNudge) + '<div class="typing"><i></i><i></i><i></i></div></div>' +
         '</div>' +
         ctaHtml(s) +
@@ -717,15 +754,40 @@
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ user_id: USER_ID })
     }).then(function (out) {
-      // Claimed is a state change, not a moment — re-render with no `fresh`
-      // class so nothing on the page moves; the button simply says "Claimed".
+      // Celebrate on the live DOM first, then re-render — by then the session
+      // says claimed, so the row is simply absent instead of snapping shut.
       S = out.session;
-      renderReveal(S, {});
+      celebrateClaim(function () { renderReveal(S, {}); });
     }).catch(function () {
       btn.disabled = false;
       btn.textContent = S.copy.claim.button;
       alert(S.copy.claim.failed);
     });
+  }
+
+  // Coins burst out of the icon, then the row folds away. Calls back once the
+  // row is gone so the caller can re-render into the claimed state.
+  function celebrateClaim(done) {
+    var bar = el('claimBar');
+    if (!bar) return done();
+    var icon = bar.querySelector('.coinIcon');
+    var origin = icon ? icon.offsetLeft + 4 : 12;
+    for (var i = 0; i < 9; i++) {
+      var coin = document.createElement('div');
+      coin.className = 'coinFx';
+      coin.innerHTML = COIN_SVG;
+      var angle = -Math.PI * (0.12 + 0.76 * (i / 8));
+      var dist = 46 + Math.random() * 62;
+      coin.style.setProperty('--dx', Math.round(Math.cos(angle) * dist) + 'px');
+      coin.style.setProperty('--dy', Math.round(Math.sin(angle) * dist) + 'px');
+      coin.style.setProperty('--rot', Math.round(Math.random() * 460 - 230) + 'deg');
+      coin.style.left = origin + 'px';
+      coin.style.top = '8px';
+      coin.style.animationDelay = (i * 0.035) + 's';
+      bar.appendChild(coin);
+    }
+    bar.classList.add('paid');
+    setTimeout(done, 1000);
   }
 
   // No visible countdown — the page just quietly reloads itself once the

@@ -146,8 +146,9 @@
     "ext": "jpg"
   },
   "astrologer": {
+    "comment": "avatarUrl is the astrologer's portrait shown beside the consult nudge. Served from public/ (relative) or a CDN. If the file is missing the client falls back to an inline placeholder.",
     "name": "Pandit ji",
-    "avatarUrl": null
+    "avatarUrl": "art/astrologer.jpg"
   },
   "coinCredit": {
     "purpose": "refund",
