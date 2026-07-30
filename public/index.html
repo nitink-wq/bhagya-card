@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Today's Fortune Card — AstroLokal</title>
+<style>
+  /* Self-hosted fonts — no third-party request on a slow connection.
+     Lora for headings, Figtree for everything else. */
+  @font-face { font-family: Lora; src: url(fonts/lora-600.woff2) format('woff2'); font-weight: 600; font-display: swap; }
+  @font-face { font-family: Lora; src: url(fonts/lora-700.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: Figtree; src: url(fonts/figtree-400.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Figtree; src: url(fonts/figtree-500.woff2) format('woff2'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: Figtree; src: url(fonts/figtree-600.woff2) format('woff2'); font-weight: 600; font-display: swap; }
+  @font-face { font-family: Figtree; src: url(fonts/figtree-700.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+
+  /* Brand palette:
+     CTA #F45722 · interactive #FA9C70 · dark-text panels #FDD9CE/#FEEEE9
+     secondary #FFF9F1 / #FFEBD2 / #FFBF6E */
+  :root {
+    --cta: #F45722;
+    --cta-soft: #FA9C70;
+    --panel: #FEEEE9;
+    --panel-deep: #FDD9CE;
+    --cream: #FFF9F1;
+    --sand: #FFEBD2;
+    --gold: #FFBF6E;
+    --gold-deep: #C57C22;
+    --gold-mid: #E8A33F;
+    --ink: #35200F;
+    --ink-soft: #8A6553;
+    --hair: rgba(197, 124, 34, .18);
+    --surface: #FFFCF7;
+    --serif: Lora, Georgia, 'Times New Roman', serif;
+    --sans: Figtree, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* no italics anywhere in this surface — <i> is only ever used as a dot */
+  i { font-style: normal; }
+  html { -webkit-text-size-adjust: 100%; }
+  /* The background is four layers, not one flat colour: a warm dawn wash down
+     the page, a gold aura at the top where the card sits, two off-axis blooms
+     that keep the mid-page from going dead, and a fine gold-dust grid on top
+     so the surface reads as paper rather than paint. */
+  body {
+    font-family: var(--sans); color: var(--ink); min-height: 100vh;
+    background:
+      radial-gradient(88% 42% at 50% 0%, rgba(255, 210, 148, .60) 0%, rgba(255, 210, 148, 0) 64%),
+      radial-gradient(62% 34% at 98% 42%, rgba(250, 156, 112, .20) 0%, rgba(250, 156, 112, 0) 72%),
+      radial-gradient(56% 30% at 2% 74%, rgba(255, 191, 110, .24) 0%, rgba(255, 191, 110, 0) 74%),
+      linear-gradient(180deg, #FFF8F0 0%, #FDEFE5 34%, #FAE4D6 70%, #F6D9C6 100%);
+    background-attachment: fixed;
+    display: flex; justify-content: center;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .55;
+    background-image: radial-gradient(circle, rgba(197, 124, 34, .13) .9px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  /* bottom padding respects the webview's own chrome — Android gesture bar /
+     3-button nav / iOS home indicator all report through safe-area-inset */
+  .wrap {
+    position: relative; z-index: 1; width: 100%; max-width: 430px;
+    padding: 0 18px calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+  h1, h2, h3, .serif { font-family: var(--serif); }
+
+  /* ---- nav: back button left, the brand centred ---------------------------- */
+  .nav {
+    display: grid; grid-template-columns: 38px 1fr 38px; align-items: center;
+    padding-top: calc(18px + env(safe-area-inset-top));
+    padding-bottom: 16px;
+  }
+  .nav .back {
+    width: 38px; height: 38px; flex: none; border: 0; cursor: pointer; border-radius: 50%;
+    background: rgba(255, 255, 255, .68); box-shadow: 0 1px 4px rgba(90, 48, 24, .1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav .back:active { background: var(--panel-deep); }
+  .nav .back svg { width: 19px; height: 19px; }
+  .nav .brand { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  /* logo.png carries ~10% transparent padding on every side; crop it away so
+     the mark sits tight against the wordmark instead of floating off it */
+  .nav .markBox { width: 26px; height: 26px; overflow: hidden; flex: none; }
+  .nav .markBox img { display: block; width: 32.5px; height: 32.5px; margin: -3.25px; }
+  .nav .word { font-family: var(--serif); font-weight: 700; font-size: 19px; color: var(--ink); letter-spacing: -.01em; }
+
+  /* ---- shared bits -------------------------------------------------------- */
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--gold-deep); text-align: center;
+  }
+  .hidden { display: none !important; }
+
+  /* ---- pre-draw: one job on the page, nothing else -------------------------
+     No streak, no CTA, no card — until the tap happens. */
+  /* the fan is the hero — centre the whole pre-draw block in the viewport
+     rather than letting it hang off the top with dead space below */
+  .predraw { display: flex; flex-direction: column; justify-content: center; min-height: calc(100vh - 180px); }
+  /* dvh tracks the webview's real visible height (Android URL bars / nav bars
+     resize it); the vh line above stays as the fallback for old webviews */
+  @supports (height: 100dvh) {
+    .predraw { min-height: calc(100dvh - 180px); }
+  }
+  .intro { text-align: center; }
+  .intro h1 { font-size: 28px; font-weight: 700; margin: 9px 0 7px; letter-spacing: -.01em; }
+  .intro p { font-size: 15px; color: var(--ink-soft); line-height: 1.5; }
+
+  .fan { display: flex; justify-content: center; align-items: center; height: 306px; position: relative; margin-top: 6px; }
+  .fan .slot {
+    position: absolute; cursor: pointer;
+    transition: transform .35s cubic-bezier(.3, 1.1, .5, 1), opacity .35s ease;
+  }
+  .fan .slot:nth-child(1) { transform: rotate(-14deg) translate(-80px, 15px); }
+  .fan .slot:nth-child(2) { transform: translateY(-10px); z-index: 3; }
+  .fan .slot:nth-child(3) { transform: rotate(14deg) translate(80px, 15px); }
+  .fan .slot:active { transform: translateY(-24px) scale(1.05); z-index: 5; }
+  .fan.picked .slot { opacity: 0; pointer-events: none; }
+  .fan.picked .slot.chosen { opacity: 1; z-index: 5; transform: translateY(-14px) rotateY(90deg) scale(1.06); }
+
+  .tapHint {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-top: 4px;
+  }
+  .tapHint svg { width: 17px; height: 17px; }
+
+  /* ---- the fortune card: gold-foil frame, art fills the window -------------
+     Placeholder art is inline SVG; a real illustration drops straight into
+     the same window at full bleed (art.baseUrl in the config). */
+  .fcard { position: relative; border-radius: 20px; padding: 7px;
+    background: linear-gradient(140deg, #FFEFCF 0%, #E8A33F 20%, #C57C22 42%, #F3C877 58%, #DE9B39 78%, #FFEFCF 100%);
+    box-shadow: 0 20px 40px -14px rgba(88, 48, 18, .5), 0 3px 7px rgba(88, 48, 18, .16),
+                inset 0 0 0 1px rgba(255, 255, 255, .5);
+  }
+  .fcard .inner {
+    position: relative; height: 100%; border-radius: 13px; overflow: hidden;
+    background: radial-gradient(115% 80% at 50% 12%, #FFFDF8 0%, #FFF4E3 52%, #FFE6C6 100%);
+    box-shadow: inset 0 0 0 1.5px rgba(197, 124, 34, .48), inset 0 0 30px rgba(197, 124, 34, .14);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fcard .inner > svg { width: 84%; height: auto; }
+  .fcard img { width: 100%; height: 100%; object-fit: cover; }
+  /* a hairline plate inside the frame — placeholder art sits in a composed
+     window rather than floating, which is what the real illustration will do */
+  .fcard .inner::after {
+    content: ""; position: absolute; inset: 14px; border-radius: 7px;
+    border: 1px solid rgba(197, 124, 34, .22); pointer-events: none;
+  }
+  /* real full-bleed art brings its own composition — drop our furniture */
+  .fcard.photo .inner::after, .fcard.photo .tick, .fcard.photo .num { display: none; }
+  /* inner corner ticks — the deck's signature, mirrors the app's card motif */
+  .fcard .tick { position: absolute; width: 12px; height: 12px; border: 1.5px solid rgba(197, 124, 34, .45); }
+  .fcard .t1 { top: 7px; left: 7px; border-right: 0; border-bottom: 0; }
+  .fcard .t2 { top: 7px; right: 7px; border-left: 0; border-bottom: 0; }
+  .fcard .t3 { bottom: 7px; left: 7px; border-right: 0; border-top: 0; }
+  .fcard .t4 { bottom: 7px; right: 7px; border-left: 0; border-top: 0; }
+  .fcard .num {
+    position: absolute; bottom: 9px; left: 0; right: 0; text-align: center;
+    font-family: var(--serif); font-size: 11px; font-weight: 600;
+    letter-spacing: .24em; color: var(--gold-deep); opacity: .8;
+  }
+
+  /* face-down cards read a shade deeper than a revealed one, so the flip lands */
+  .slot .fcard { width: 126px; height: 196px; }
+  .slot .fcard .inner { background: linear-gradient(165deg, #FFF1DA 0%, #FBDDB4 55%, #F6CE99 100%); }
+  .slot .fcard .inner > svg { width: 72%; }
+  .slot .fcard .inner::after { inset: 10px; }
+
+  /* the drawn card, centre stage on a soft plate — the plate is what makes it
+     read as a framed portrait rather than a sticker floating on the page.
+     It overlaps the story surface below so card + telling stitch into one. */
+  .stage { display: flex; justify-content: center; position: relative; z-index: 3; margin-bottom: -44px; }
+  .stage::before {
+    content: ""; position: absolute; left: 50%; top: 48%; width: 340px; height: 340px;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 199, 128, .48) 0%, rgba(255, 199, 128, 0) 68%);
+  }
+  .stage .plate {
+    position: relative; padding: 18px 22px; border-radius: 28px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .74) 0%, rgba(255, 255, 255, .40) 100%);
+    box-shadow: 0 16px 36px -20px rgba(122, 72, 36, .55);
+  }
+  .stage .fcard { width: 204px; height: 316px; }
+  /* the deal only plays on the draw itself — a claim or a re-open must not
+     replay it, or the page looks like it reloaded under the user */
+  .fresh .stage .fcard { animation: dealIn .62s cubic-bezier(.2, .9, .3, 1.1) both; }
+  @keyframes dealIn {
+    0% { opacity: 0; transform: perspective(900px) rotateY(84deg) scale(.9); }
+    100% { opacity: 1; transform: perspective(900px) rotateY(0) scale(1); }
+  }
+
+  /* ---- the story: card name, one insight, the astrologer, the CTA ---------
+     ONE soft surface that the card overlaps from above — grounded enough that
+     the text doesn't blend into the page, but still a single panel with no
+     inner boxes or divider rules, so it never reads as stacked widgets. */
+  .story {
+    text-align: center; position: relative; z-index: 2;
+    padding: 64px 18px 20px; border-radius: 26px;
+    background: linear-gradient(180deg, rgba(255, 252, 246, .94) 0%, rgba(255, 249, 241, .72) 100%);
+    box-shadow: 0 12px 30px rgba(122, 72, 36, .09), inset 0 0 0 1px rgba(197, 124, 34, .13);
+  }
+  .fresh .story { animation: rise .5s .12s cubic-bezier(.2, .8, .3, 1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .story h2 { font-size: 27px; font-weight: 700; letter-spacing: -.015em; line-height: 1.2; }
+  .story .chip {
+    display: inline-block; margin-top: 11px; padding: 6px 14px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: .03em; color: var(--ink-soft);
+    background: var(--sand); box-shadow: inset 0 0 0 1px rgba(197, 124, 34, .14);
+  }
+  /* one insight, balanced so every line wraps to a similar width */
+  .insight {
+    margin: 16px auto 0; max-width: 34ch; text-wrap: balance;
+    font-size: 16.5px; line-height: 1.66; color: var(--ink);
+  }
+  .note { margin: 12px auto 0; max-width: 32ch; text-wrap: balance; font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
+
+  /* astrologer nudge — sits on the same open surface, only the bubble is tinted */
+  .astro { display: flex; align-items: center; gap: 12px; margin-top: 26px; text-align: left; }
+  .astro .avatar { position: relative; width: 48px; height: 48px; flex: none; }
+  .astro .avatar svg, .astro .avatar img { width: 48px; height: 48px; border-radius: 50%; display: block; object-fit: cover; }
+  .astro .avatar .live {
+    position: absolute; right: 1px; bottom: 2px; width: 12px; height: 12px;
+    border-radius: 50%; background: #2FBF57; box-shadow: 0 0 0 2.5px var(--cream);
+  }
+  .astro .bubble {
+    background: var(--panel);
+    border-radius: 16px 16px 16px 6px; padding: 12px 14px;
+    font-size: 14px; font-weight: 500; line-height: 1.5;
+  }
+  .astro .typing { display: flex; gap: 4px; margin-top: 7px; }
+  .astro .typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); animation: blink 1.3s infinite; }
+  .astro .typing i:nth-child(2) { animation-delay: .2s; }
+  .astro .typing i:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 60%, 100% { opacity: .3; } 30% { opacity: 1; } }
+
+  /* ---- the one CTA, at the end of the story -------------------------------
+     Brand CTA orange, pressed = the interactive tone — same pair the app uses. */
+  .cta {
+    display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 22px;
+    background: var(--cta);
+    color: #fff; text-decoration: none; border-radius: 16px; padding: 17px;
+    font-size: 16.5px; font-weight: 700; box-shadow: 0 10px 22px -8px rgba(244, 87, 34, .6);
+  }
+  .cta:active { background: var(--cta-soft); }
+  .cta svg { width: 20px; height: 20px; }
+  /* the same CTA, re-offered as a bar once the inline one scrolls away */
+  .ctaBar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center;
+    padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(246, 217, 198, 0) 0%, #F6D9C6 46%);
+    transform: translateY(115%); transition: transform .28s ease;
+  }
+  .ctaBar.show { transform: none; }
+  .ctaBar .cta { width: 100%; max-width: 394px; margin-top: 0; }
+
+  /* ---- streak: a slim 7-node strip above the card ---------------------------
+     Deliberately quiet — small dots, one thin line, a whisper of a surface —
+     so it reads as a status strip, not a competing card. It only grows the
+     claim row on the days it actually owes coins. */
+  .streak {
+    position: relative; margin-bottom: 18px; padding: 11px 14px 12px; border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .72) 0%, rgba(255, 252, 246, .46) 100%);
+    box-shadow: 0 3px 12px rgba(122, 72, 36, .05), inset 0 0 0 1px rgba(197, 124, 34, .13);
+  }
+  .sHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .sHead h3 { display: flex; align-items: center; gap: 6px; font-size: 14.5px; font-weight: 700; }
+  .sHead h3 svg { width: 14px; height: 14px; }
+  .sHead .dayPill { font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+  .track { display: flex; align-items: flex-start; }
+  .node { flex: none; width: 24px; text-align: center; }
+  .node .dot {
+    width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--ink-soft);
+    background: rgba(255, 255, 255, .9); box-shadow: inset 0 0 0 1.4px rgba(197, 124, 34, .22);
+  }
+  .node .dot svg { width: 11px; height: 11px; }
+  .node.done .dot { background: linear-gradient(160deg, var(--gold) 0%, var(--gold-mid) 100%); color: #fff; box-shadow: none; }
+  .node.today .dot { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1.8px var(--ink); }
+  .node .amt {
+    display: inline-flex; align-items: center; gap: 2px; margin-top: 4px;
+    font-size: 10px; font-weight: 700; color: var(--gold-deep);
+  }
+  .node .amt svg { width: 10px; height: 10px; }
+  .node.upcoming .amt { color: var(--ink-soft); opacity: .75; }
+  .link { flex: 1; height: 1.6px; margin-top: 11px; border-radius: 2px; background: rgba(197, 124, 34, .18); }
+  .link.done { background: linear-gradient(90deg, var(--gold-mid), var(--gold)); }
+
+  /* the claim row, shown only on a day that paid out — coin | you won | Claim,
+     the same layout the app's wallet strip uses */
+  .claimBar {
+    display: flex; align-items: center; gap: 10px; margin-top: 11px; padding: 7px 7px 7px 10px;
+    border-radius: 13px; background: var(--cream);
+    box-shadow: inset 0 0 0 1px rgba(197, 124, 34, .16);
+  }
+  .claimBar .coinIcon { width: 26px; height: 26px; flex: none; }
+  .claimBar .txt { flex: 1; line-height: 1.2; display: flex; align-items: baseline; gap: 6px; }
+  .claimBar .lbl { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+  .claimBar .val { font-size: 15px; font-weight: 700; }
+  .claimBar button {
+    flex: none; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer;
+    font-family: var(--sans); font-size: 13.5px; font-weight: 700; color: #fff; background: var(--cta);
+    box-shadow: 0 4px 10px -3px rgba(244, 87, 34, .55);
+  }
+  .claimBar button:active { background: var(--cta-soft); }
+  .claimBar button[disabled] { pointer-events: none; }
+  /* claimed is a resting state, not an event: the button just says so and
+     stops responding — no burst, no re-animation, nothing moves */
+  .claimBar button.claimed { background: rgba(53, 32, 15, .10); color: var(--ink-soft); box-shadow: none; }
+
+  /* ---- fallbacks ---------------------------------------------------------- */
+  .errCard { text-align: center; background: var(--surface); border-radius: 22px; padding: 30px 22px; margin-top: 20px;
+             box-shadow: 0 8px 24px rgba(90, 48, 24, .09); }
+  .errCard h3 { font-size: 20px; margin-bottom: 8px; }
+  .errCard p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
+  .errCard button {
+    margin-top: 18px; border: 0; border-radius: 14px; padding: 14px 30px; cursor: pointer;
+    font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; background: var(--cta);
+  }
+  .skel { height: 300px; border-radius: 24px; background: var(--panel); opacity: .5; margin-top: 24px;
+          animation: shim 1.4s ease-in-out infinite; }
+  @keyframes shim { 0%, 100% { opacity: .35; } 50% { opacity: .62; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav">
+    <button class="back" id="backBtn" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#35200F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="brand">
+      <span class="markBox"><img src="logo.png" alt=""></span><span class="word">AstroLokal</span>
+    </div>
+    <span></span>
+  </div>
+  <div id="main"><div class="skel"></div></div>
+</div>
+<div class="ctaBar" id="ctaBar"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var USER_ID = new URLSearchParams(location.search).get('user_id') || '';
+  var API = { session: '/api/session', draw: '/api/draw', claim: '/api/claim' };
+  // Only used when the network itself fails and server copy never arrived.
+  var NET_COPY = { title: 'No internet', body: 'Please check your connection and try again.', retry: 'Try again' };
+
+  var S = null;
+  var countTimer = null;
+  var ctaWatch = null;
+
+  // ---- placeholder card art ------------------------------------------------
+  // One emblem per art_key in the fixed 20-card catalogue. These are
+  // stand-ins: set art.baseUrl in the config and the client loads
+  // {baseUrl}/{art_key}.{ext} full-bleed into the same frame instead.
+  var K = { o1: '#F45722', o2: '#FA9C70', g1: '#FFBF6E', g2: '#E8A33F', gd: '#C57C22', c: '#FFF7E8', d: '#5A3A22' };
+
+  function svg(inner) {
+    return '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs>' +
+        // userSpaceOnUse: one light source across the whole emblem, and it
+        // still paints shapes with a degenerate bbox (e.g. a vertical line).
+        '<linearGradient id="warm" gradientUnits="userSpaceOnUse" x1="0" y1="10" x2="0" y2="110">' +
+          '<stop offset="0" stop-color="' + K.g1 + '"/><stop offset="1" stop-color="' + K.o1 + '"/></linearGradient>' +
+        '<linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="0" y1="10" x2="0" y2="110">' +
+          '<stop offset="0" stop-color="#FFDCA6"/><stop offset="1" stop-color="' + K.gd + '"/></linearGradient>' +
+        '<radialGradient id="glow"><stop offset="0" stop-color="#FFD9A0" stop-opacity=".55"/>' +
+          '<stop offset="1" stop-color="#FFD9A0" stop-opacity="0"/></radialGradient>' +
+      '</defs>' +
+      '<circle cx="60" cy="58" r="54" fill="url(#glow)"/>' + inner + '</svg>';
+  }
+  var SPARK = '<g fill="' + K.g1 + '" opacity=".85">' +
+    '<path d="M20 22l2 5.4 5.4 2-5.4 2-2 5.4-2-5.4-5.4-2 5.4-2z"/>' +
+    '<path d="M101 30l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/></g>';
+  var GROUND = '<path d="M20 104h80" stroke="url(#gold)" stroke-width="4" stroke-linecap="round" opacity=".5"/>';
+
+  var ART = {
+    the_sun: svg(
+      '<circle cx="60" cy="52" r="22" fill="url(#warm)"/>' +
+      '<circle cx="60" cy="52" r="22" fill="none" stroke="' + K.c + '" stroke-width="1.6" opacity=".55"/>' +
+      '<g stroke="url(#gold)" stroke-width="5" stroke-linecap="round">' +
+        '<path d="M60 22V12M85 27l6-6M35 27l-6-6M90 52h10M20 52H10M85 77l6 6M35 77l-6 6"/></g>' + GROUND),
+
+    the_star: svg(SPARK +
+      '<path d="M60 12l9 32 32 9-32 9-9 32-9-32-32-9 32-9z" fill="url(#warm)"/>' +
+      '<path d="M60 36l4.5 17L82 57l-17.5 4.5L60 79l-4.5-17.5L38 57l17.5-4z" fill="' + K.c + '" opacity=".62"/>' +
+      '<g fill="url(#gold)"><circle cx="24" cy="90" r="4"/><circle cx="96" cy="86" r="5"/></g>' + GROUND),
+
+    // strength as a banyan — deep roots, not a beast; reads instantly here
+    the_strength: svg(SPARK +
+      '<circle cx="60" cy="40" r="30" fill="url(#warm)"/>' +
+      '<circle cx="31" cy="50" r="18" fill="url(#warm)"/>' +
+      '<circle cx="89" cy="50" r="18" fill="url(#warm)"/>' +
+      '<circle cx="60" cy="32" r="19" fill="url(#gold)" opacity=".4"/>' +
+      '<path d="M60 100V58" stroke="url(#gold)" stroke-width="11" stroke-linecap="round"/>' +
+      '<g stroke="url(#gold)" stroke-width="5" stroke-linecap="round"><path d="M39 100V64M81 100V64"/></g>' + GROUND),
+
+    the_lantern: svg(SPARK +
+      '<circle cx="60" cy="62" r="33" fill="url(#glow)"/>' +
+      '<path d="M44 22q16-16 32 0" fill="none" stroke="url(#gold)" stroke-width="4" stroke-linecap="round"/>' +
+      '<rect x="38" y="24" width="44" height="10" rx="5" fill="url(#gold)"/>' +
+      '<path d="M44 34h32l4 8v42H40V42z" fill="url(#warm)"/>' +
+      '<rect x="47" y="42" width="26" height="42" rx="4" fill="#FFFAF0"/>' +
+      '<path d="M60 50c-7 11 0 15 0 21 0-6 7-10 0-21z" fill="url(#warm)"/>' +
+      '<rect x="36" y="84" width="48" height="10" rx="5" fill="url(#gold)"/>' +
+      '<g stroke="url(#gold)" stroke-width="4" stroke-linecap="round"><path d="M46 94v7M74 94v7"/></g>'),
+
+    the_wheel: svg(
+      '<circle cx="60" cy="58" r="42" fill="none" stroke="url(#gold)" stroke-width="6"/>' +
+      '<g stroke="url(#warm)" stroke-width="5" stroke-linecap="round">' +
+        '<path d="M60 20v76M22 58h76M33 31l54 54M87 31L33 85"/></g>' +
+      '<circle cx="60" cy="58" r="28" fill="none" stroke="url(#warm)" stroke-width="4"/>' +
+      '<circle cx="60" cy="58" r="9" fill="url(#gold)"/>' +
+      '<g fill="url(#gold)"><circle cx="60" cy="10" r="4"/><circle cx="108" cy="58" r="4"/>' +
+        '<circle cx="12" cy="58" r="4"/><circle cx="60" cy="106" r="4"/></g>'),
+
+    the_chariot: svg(SPARK +
+      '<path d="M60 8l4.5 11L76 23.5 64.5 28 60 39l-4.5-11L44 23.5 55.5 19z" fill="url(#gold)"/>' +
+      '<path d="M34 50h52l-8-12H42z" fill="url(#gold)"/>' +
+      '<rect x="30" y="52" width="60" height="30" rx="8" fill="url(#warm)"/>' +
+      '<g stroke="' + K.c + '" stroke-width="2.5" opacity=".5"><path d="M45 52v30M60 52v30M75 52v30"/></g>' +
+      '<path d="M20 82h80" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/>' +
+      '<circle cx="38" cy="90" r="14" fill="none" stroke="url(#gold)" stroke-width="5"/>' +
+      '<circle cx="82" cy="90" r="14" fill="none" stroke="url(#gold)" stroke-width="5"/>' +
+      '<g stroke="url(#gold)" stroke-width="2.5"><path d="M38 78v24M26 90h24M82 78v24M70 90h24"/></g>'),
+
+    the_world: svg(
+      '<circle cx="60" cy="58" r="46" fill="none" stroke="url(#gold)" stroke-width="4" ' +
+        'stroke-dasharray="1 9" stroke-linecap="round"/>' +
+      '<circle cx="60" cy="58" r="30" fill="url(#warm)"/>' +
+      '<g stroke="' + K.c + '" stroke-width="2.5" fill="none" opacity=".7">' +
+        '<path d="M30 58h60M60 28c11 12 11 48 0 60M60 28c-11 12-11 48 0 60"/></g>' +
+      '<g fill="url(#gold)"><circle cx="60" cy="12" r="5"/><circle cx="60" cy="104" r="5"/></g>'),
+
+    the_open_road: svg(SPARK +
+      '<circle cx="60" cy="28" r="15" fill="url(#gold)"/>' +
+      '<path d="M42 106L54 48h12l12 58z" fill="url(#warm)"/>' +
+      '<path d="M60 100V54" stroke="' + K.c + '" stroke-width="4" stroke-dasharray="7 8" stroke-linecap="round"/>' +
+      '<path d="M8 104c14-8 26-8 38-5M112 104c-14-8-26-8-38-5" stroke="url(#gold)" stroke-width="4" ' +
+        'stroke-linecap="round" fill="none" opacity=".55"/>'),
+
+    the_empress: svg(SPARK +
+      '<circle cx="60" cy="16" r="4" fill="url(#gold)"/>' +
+      '<path d="M34 32l11 12 15-18 15 18 11-12 3 20H31z" fill="url(#gold)"/>' +
+      '<g fill="url(#warm)"><path d="M60 102c-16-8-24-26-20-44 14 8 22 24 20 44z"/>' +
+        '<path d="M60 102c16-8 24-26 20-44-14 8-22 24-20 44z"/></g>' +
+      '<path d="M60 102c-9-16-9-34 0-48 9 14 9 32 0 48z" fill="url(#gold)"/>' + GROUND),
+
+    the_full_home: svg(SPARK +
+      '<path d="M14 56L60 20l46 36" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>' +
+      '<rect x="26" y="56" width="68" height="48" rx="8" fill="url(#warm)"/>' +
+      '<rect x="50" y="74" width="20" height="30" rx="4" fill="' + K.c + '"/>' +
+      '<circle cx="65" cy="90" r="2.5" fill="url(#gold)"/>' +
+      '<g fill="' + K.c + '" opacity=".85"><rect x="34" y="66" width="12" height="12" rx="3"/>' +
+        '<rect x="74" y="66" width="12" height="12" rx="3"/></g>'),
+
+    // a toran of mango leaves and marigolds over the door
+    the_festive_gate: svg(SPARK +
+      '<rect x="16" y="34" width="15" height="70" rx="7" fill="url(#warm)"/>' +
+      '<rect x="89" y="34" width="15" height="70" rx="7" fill="url(#warm)"/>' +
+      '<rect x="10" y="20" width="100" height="15" rx="7" fill="url(#gold)"/>' +
+      '<g fill="url(#warm)">' +
+        '<path d="M38 36c-5 8-5 16 0 22 5-6 5-14 0-22z"/><path d="M49 36c-5 10-5 20 0 27 5-7 5-17 0-27z"/>' +
+        '<path d="M60 36c-5 12-5 23 0 31 5-8 5-19 0-31z"/><path d="M71 36c-5 10-5 20 0 27 5-7 5-17 0-27z"/>' +
+        '<path d="M82 36c-5 8-5 16 0 22 5-6 5-14 0-22z"/></g>' +
+      '<g fill="url(#gold)"><circle cx="38" cy="62" r="4"/><circle cx="49" cy="68" r="4"/>' +
+        '<circle cx="60" cy="72" r="4.5"/><circle cx="71" cy="68" r="4"/><circle cx="82" cy="62" r="4"/></g>' + GROUND),
+
+    the_emperor: svg(SPARK +
+      '<path d="M38 22l9 11 13-17 13 17 9-11 3 17H35z" fill="url(#gold)"/>' +
+      '<rect x="34" y="46" width="52" height="32" rx="7" fill="url(#warm)"/>' +
+      '<g stroke="' + K.c + '" stroke-width="3" stroke-linecap="round" opacity=".55">' +
+        '<path d="M46 56h28M46 66h28"/></g>' +
+      '<rect x="27" y="76" width="66" height="12" rx="6" fill="url(#gold)"/>' +
+      '<path d="M35 88v14M85 88v14" stroke="url(#warm)" stroke-width="8" stroke-linecap="round"/>'),
+
+    the_skilled_hand: svg(SPARK +
+      '<circle cx="60" cy="30" r="17" fill="url(#glow)"/>' +
+      '<path d="M60 15l4.5 11.5L76 31l-11.5 4.5L60 47l-4.5-11.5L44 31l11.5-4.5z" fill="url(#gold)"/>' +
+      '<g fill="url(#warm)">' +
+        '<rect x="45" y="58" width="9" height="26" rx="4.5"/><rect x="56" y="54" width="9" height="30" rx="4.5"/>' +
+        '<rect x="67" y="58" width="9" height="26" rx="4.5"/><rect x="78" y="63" width="9" height="21" rx="4.5"/>' +
+        '<path d="M41 72c-6 2-9 8-7 13 2 4 6 6 10 5l2-1V72z"/>' +   // thumb, joined to the palm
+        '<path d="M41 80h48v8c0 11-8 19-18 19H59c-10 0-18-8-18-19z"/></g>'),
+
+    the_scales: svg(SPARK +
+      '<path d="M60 24v64" stroke="url(#warm)" stroke-width="7" stroke-linecap="round"/>' +
+      '<path d="M22 36h76" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/>' +
+      '<circle cx="60" cy="22" r="7" fill="url(#gold)"/>' +
+      '<g stroke="url(#warm)" stroke-width="3"><path d="M26 36v12M94 36v12"/></g>' +
+      '<path d="M10 48h32c0 12-7 20-16 20S10 60 10 48z" fill="url(#warm)"/>' +
+      '<path d="M78 48h32c0 12-7 20-16 20s-16-8-16-20z" fill="url(#warm)"/>' +
+      '<path d="M46 88h28" stroke="url(#warm)" stroke-width="6" stroke-linecap="round"/>' +
+      '<path d="M38 98h44" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>'),
+
+    the_lovers: svg(SPARK +
+      '<path d="M16 44C16 26 32 14 60 14s44 12 44 30" fill="none" stroke="url(#gold)" ' +
+        'stroke-width="5" stroke-linecap="round"/>' +
+      '<path d="M46 100C26 86 16 74 16 62c0-8 6-14 14-14 6 0 12 3 16 9 4-6 10-9 16-9 8 0 14 6 14 14 0 12-10 24-30 38z" fill="url(#warm)"/>' +
+      '<path d="M84 98c-16-11-24-21-24-31 0-7 5-12 12-12 5 0 9 2 12 7 3-5 7-7 12-7 7 0 12 5 12 12 0 10-8 20-24 31z" fill="url(#gold)"/>'),
+
+    the_three_cups: svg(SPARK +
+      '<g fill="url(#warm)">' +
+        '<path d="M45 30h30c0 14-6 22-15 22s-15-8-15-22z"/>' +
+        '<path d="M16 46h30c0 14-6 22-15 22s-15-8-15-22z"/>' +
+        '<path d="M74 46h30c0 14-6 22-15 22s-15-8-15-22z"/></g>' +
+      '<g stroke="url(#gold)" stroke-width="5" stroke-linecap="round">' +
+        '<path d="M60 52v14M31 68v12M89 68v12"/></g>' +
+      '<g fill="url(#gold)"><rect x="47" y="64" width="26" height="8" rx="4"/>' +
+        '<rect x="18" y="80" width="26" height="8" rx="4"/><rect x="76" y="80" width="26" height="8" rx="4"/></g>' + GROUND),
+
+    the_teacher: svg(SPARK +
+      '<circle cx="60" cy="40" r="15" fill="url(#glow)"/>' +
+      '<path d="M60 30c-6 9 0 12 0 16 0-4 6-7 0-16z" fill="url(#warm)"/>' +
+      '<path d="M60 56c-10-8-24-10-38-8v40c14-2 28 0 38 8z" fill="url(#warm)"/>' +
+      '<path d="M60 56c10-8 24-10 38-8v40c-14-2-28 0-38 8z" fill="url(#gold)"/>' +
+      '<path d="M60 56v40" stroke="' + K.c + '" stroke-width="3"/>' + GROUND),
+
+    the_golden_coin: svg(SPARK +
+      '<circle cx="60" cy="56" r="42" fill="none" stroke="url(#gold)" stroke-width="3" ' +
+        'stroke-dasharray="2 8" stroke-linecap="round"/>' +
+      '<circle cx="60" cy="56" r="31" fill="url(#gold)"/>' +
+      '<circle cx="60" cy="56" r="24" fill="none" stroke="' + K.c + '" stroke-width="2.5" opacity=".65"/>' +
+      '<path d="M60 38l5 13 13 5-13 5-5 13-5-13-13-5 13-5z" fill="' + K.c + '"/>' + GROUND),
+
+    the_wish_cup: svg(SPARK +
+      '<g fill="url(#gold)"><circle cx="45" cy="26" r="5"/><circle cx="60" cy="17" r="6"/><circle cx="75" cy="26" r="5"/></g>' +
+      '<path d="M32 40h56c0 22-11 34-28 34S32 62 32 40z" fill="url(#warm)"/>' +
+      '<path d="M36 48c10 6 38 6 48 0" stroke="' + K.c + '" stroke-width="3" stroke-linecap="round" fill="none" opacity=".55"/>' +
+      '<path d="M60 74v18" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>' +
+      '<rect x="39" y="92" width="42" height="10" rx="5" fill="url(#gold)"/>'),
+
+    the_harvest: svg(SPARK +
+      '<path d="M60 104V44" stroke="url(#warm)" stroke-width="7" stroke-linecap="round"/>' +
+      '<g fill="url(#gold)">' +
+        '<path d="M60 52c-18 0-25-14-25-14 17-4 25 6 25 14z"/><path d="M60 52c18 0 25-14 25-14-17-4-25 6-25 14z"/>' +
+        '<path d="M60 74c-18 0-25-14-25-14 17-4 25 6 25 14z"/><path d="M60 74c18 0 25-14 25-14-17-4-25 6-25 14z"/></g>' +
+      '<circle cx="60" cy="32" r="9" fill="url(#warm)"/>' + GROUND)
+  };
+
+  var BACK_ART = svg(
+    '<circle cx="60" cy="58" r="46" fill="none" stroke="url(#gold)" stroke-width="2" stroke-dasharray="2 7"/>' +
+    '<circle cx="60" cy="58" r="35" fill="none" stroke="url(#gold)" stroke-width="2.5"/>' +
+    '<path d="M60 20l7 24 24 7-24 7-7 24-7-24-24-7 24-7z" fill="url(#warm)"/>' +
+    '<circle cx="60" cy="58" r="7" fill="' + K.c + '"/>' +
+    '<g fill="url(#gold)"><circle cx="60" cy="7" r="3.5"/><circle cx="111" cy="58" r="3.5"/>' +
+    '<circle cx="9" cy="58" r="3.5"/><circle cx="60" cy="109" r="3.5"/></g>');
+
+  var COIN_SVG = '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#FFDFA6"/><stop offset="1" stop-color="#E8A33F"/></linearGradient></defs>' +
+    '<circle cx="16" cy="16" r="15" fill="url(#cg)"/>' +
+    '<circle cx="16" cy="16" r="11.5" fill="none" stroke="#fff" stroke-width="1.5" opacity=".55"/>' +
+    '<path d="M16 8l2.4 5.6L24 16l-5.6 2.4L16 24l-2.4-5.6L8 16l5.6-2.4z" fill="#fff" opacity=".95"/></svg>';
+
+  var AVATAR = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="av" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#FFD9A0"/><stop offset="1" stop-color="#E8A33F"/></linearGradient></defs>' +
+    '<circle cx="32" cy="32" r="32" fill="url(#av)"/>' +
+    '<circle cx="32" cy="25" r="11" fill="#FFF6E8"/>' +
+    '<path d="M32 39c12 0 20 8 21 18H11c1-10 9-18 21-18z" fill="#FFF6E8"/>' +
+    '<path d="M32 16c5 0 8 3 8 6-3-2-13-2-16 0 0-3 3-6 8-6z" fill="#8A6553" opacity=".55"/></svg>';
+
+  // currentColor: the CTA is gold with dark ink text, so the icon follows it.
+  var CHAT_ICON = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M21 12a8 8 0 01-8 8H7l-4 3v-5.5A8 8 0 1121 12z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+
+  var CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var FLAME_ICON = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M13 2c.6 3.2-.7 5-2.4 6.6C8.6 10.5 7 12.2 7 15a5.6 5.6 0 0011.2 0c0-2.6-1.3-4.3-2.6-6.1-.5 1-1.2 1.6-2 1.9.6-3-.2-6.3-.6-8.8z" fill="#F45722"/>' +
+    '<path d="M12.2 12.5c.4 1.8-.4 2.6-1 3.4-.5.7-.8 1.3-.8 2.1a2.7 2.7 0 005.4 0c0-1.6-1.1-2.6-1.8-3.6-.4.5-.8.8-1.3 1 .2-1 0-2-.5-2.9z" fill="#FFBF6E"/></svg>';
+
+  var TAP_ICON = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M9 11V6a2 2 0 114 0v9m0-4a2 2 0 114 0v1m-4-1v-1m4 2a2 2 0 114 0v3a6 6 0 01-6 6h-2a6 6 0 01-6-6v-3l2-1" ' +
+    'stroke="#8A6553" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  // ---- helpers -------------------------------------------------------------
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function fmt(t, vars) {
+    return String(t || '').replace(/\{(\w+)\}/g, function (_, k) { return vars[k] != null ? vars[k] : ''; });
+  }
+  function api(path, opts) {
+    return fetch(path, opts).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (!res.ok) { var e = new Error(body.error || res.status); e.copy = body.copy; throw e; }
+        return body;
+      });
+    });
+  }
+  // The card frame — identical shell for a face-down card and a drawn one.
+  function cardFrame(inner, numeral, photo) {
+    return '<div class="fcard' + (photo ? ' photo' : '') + '"><div class="inner">' + inner +
+      '<span class="tick t1"></span><span class="tick t2"></span>' +
+      '<span class="tick t3"></span><span class="tick t4"></span>' +
+      (numeral ? '<span class="num">' + esc(numeral) + '</span>' : '') +
+      '</div></div>';
+  }
+  function hasRealArt() { return Boolean(S && S.art && S.art.baseUrl); }
+  function artFor(card) {
+    var a = (S && S.art) || {};
+    if (a.baseUrl) return '<img src="' + esc(a.baseUrl + '/' + card.artKey + '.' + (a.ext || 'png')) + '" alt="">';
+    return ART[card.artKey] || ART.the_star;
+  }
+
+  // ---- render --------------------------------------------------------------
+  // A copy block without `retry` (e.g. the please-log-in state) renders as a
+  // dead end on purpose — retrying without a user_id can never succeed.
+  function renderError(copy) {
+    var c = copy || NET_COPY;
+    showCtaBar(false);
+    el('main').innerHTML = '<div class="errCard"><h3>' + esc(c.title) + '</h3><p>' + esc(c.body) + '</p>' +
+      (c.retry ? '<button id="retryBtn">' + esc(c.retry) + '</button>' : '') + '</div>';
+    var btn = el('retryBtn');
+    if (btn) btn.onclick = load;
+  }
+
+  // Pre-draw: no streak, no CTA, no countdown. One job — tap a card.
+  function renderFan(s) {
+    showCtaBar(false);
+    el('main').innerHTML =
+      '<div class="predraw">' +
+      '<div class="intro">' +
+        '<div class="eyebrow">' + esc(s.copy.header.eyebrow) + '</div>' +
+        '<h1>' + esc(s.copy.draw.prompt) + '</h1>' +
+        '<p>' + esc(s.copy.draw.hint) + '</p>' +
+      '</div>' +
+      '<div class="fan" id="fan">' +
+        [0, 1, 2].map(function (i) {
+          return '<div class="slot" data-pick="' + i + '">' + cardFrame(BACK_ART, '') + '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="tapHint">' + TAP_ICON + esc(s.copy.draw.tap) + '</div>' +
+      '</div>';
+
+    Array.prototype.forEach.call(document.querySelectorAll('.slot'), function (node) {
+      node.addEventListener('click', function () { onPick(Number(node.dataset.pick), node); }, { once: true });
+    });
+  }
+
+  function onPick(pick, node) {
+    el('fan').classList.add('picked');
+    node.classList.add('chosen');
+    var req = api(API.draw, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ user_id: USER_ID, pick: pick })
+    });
+    var anim = new Promise(function (r) { setTimeout(r, 420); });
+    Promise.all([req, anim]).then(function (r) {
+      S = r[0].session;
+      renderReveal(S, { justDrawn: !r[0].alreadyDrawn });
+    }).catch(function (err) { renderError(err.copy); });
+  }
+
+  // The streak track: seven nodes on one connected line, the way the app's
+  // other reward surfaces draw it. Days already collected are gold with a
+  // check, today is ringed, the rest are pale. Coin amounts hang under the
+  // days that pay. The redeem row only exists on a day that actually paid.
+  function streakHtml(s) {
+    var st = s.streak, r = s.reward;
+
+    var track = st.checkpoints.map(function (cp, i) {
+      var link = i === 0 ? '' :
+        '<div class="link' + (cp.state === 'done' ? ' done' : '') + '"></div>';
+      var cls = 'node ' + (cp.state === 'done' ? 'done' : cp.state === 'today' ? 'today' : 'upcoming');
+      return link + '<div class="' + cls + '"><div class="dot">' +
+        (cp.state === 'done' ? CHECK_ICON : cp.day) + '</div>' +
+        (cp.reward > 0 ? '<span class="amt">' + COIN_SVG + cp.reward + '</span>' : '') +
+        '</div>';
+    }).join('');
+
+    var html = '<div class="streak">' +
+      '<div class="sHead">' +
+        '<h3>' + FLAME_ICON + esc(s.copy.streak.title) + '</h3>' +
+        '<span class="dayPill">' +
+          esc(fmt(s.copy.streak.progress, { day: st.progress, total: st.length })) +
+        '</span>' +
+      '</div>' +
+      '<div class="track">' + track + '</div>';
+
+    if (r.amount > 0) {
+      html += '<div class="claimBar" id="claimBar">' +
+        '<div class="coinIcon">' + COIN_SVG + '</div>' +
+        '<div class="txt">' +
+          '<span class="lbl">' + esc(s.copy.claim.label) + '</span>' +
+          '<span class="val">' + esc(fmt(s.copy.claim.coins, { amount: r.amount })) + '</span>' +
+        '</div>' +
+        '<button id="claimBtn"' + (r.claimed ? ' class="claimed" disabled' : '') + '>' +
+          esc(r.claimed ? s.copy.claim.claimed : s.copy.claim.button) +
+        '</button>' +
+        '</div>';
+    }
+    return html + '</div>';
+  }
+
+  // Post-draw. Read top to bottom it is one telling:
+  //   streak → the card → its name → its words → what it means → who can say more.
+  function renderReveal(s, opts) {
+    opts = opts || {};
+    var c = s.card;
+    if (!c) return renderError(s.copy.error);
+
+    var html = streakHtml(s) +
+      '<div class="stage"><div class="plate">' +
+        cardFrame(artFor(c), c.numeral, hasRealArt()) +
+      '</div></div>' +
+      '<div class="story">' +
+        '<h2>' + esc(c.title) + '</h2>' +
+        '<span class="chip">' + esc(s.copy.reveal.findingLabel) + '</span>' +
+        // ONE insight, not two near-identical paragraphs: the card speaks in
+        // its fortune lines; the finding's open question lives in the
+        // astrologer bubble below, where it belongs.
+        '<p class="insight">' + c.fortune.map(esc).join(' ') + '</p>' +
+        (s.postStreak ? '<p class="note">' + esc(s.copy.postStreak) + '</p>' : '') +
+        '<div class="astro">' +
+          '<div class="avatar">' + AVATAR + '<span class="live"></span></div>' +
+          '<div class="bubble">' + esc(c.consultNudge) + '<div class="typing"><i></i><i></i><i></i></div></div>' +
+        '</div>' +
+        ctaHtml(s) +
+      '</div>';
+
+    el('main').innerHTML = html;
+    el('main').classList.toggle('fresh', Boolean(opts.justDrawn));
+    var btn = el('claimBtn');
+    if (btn && !btn.disabled) btn.onclick = onClaim;
+    scheduleRollover(s);
+    watchCta(s);
+  }
+
+  function ctaHtml(s) {
+    return '<a class="cta" id="inlineCta" href="' + esc(s.card.consultUrl) + '">' +
+      CHAT_ICON + esc(s.copy.consult.cta) + '</a>';
+  }
+
+  // The CTA lives at the end of the story. The fixed bar is the same button
+  // re-offered once that one scrolls out of sight — never two at once.
+  function watchCta(s) {
+    if (ctaWatch) { ctaWatch.disconnect(); ctaWatch = null; }
+    el('ctaBar').innerHTML = ctaHtml(s);
+    var inline = el('inlineCta');
+    if (!inline || !window.IntersectionObserver) return;
+    ctaWatch = new IntersectionObserver(function (entries) {
+      showCtaBar(!entries[0].isIntersecting);
+    }, { threshold: 0 });
+    ctaWatch.observe(inline);
+  }
+  function showCtaBar(on) { el('ctaBar').classList.toggle('show', Boolean(on)); }
+
+  function onClaim() {
+    var btn = el('claimBtn');
+    btn.disabled = true;
+    btn.textContent = S.copy.claim.claiming;
+    api(API.claim, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ user_id: USER_ID })
+    }).then(function (out) {
+      // Claimed is a state change, not a moment — re-render with no `fresh`
+      // class so nothing on the page moves; the button simply says "Claimed".
+      S = out.session;
+      renderReveal(S, {});
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = S.copy.claim.button;
+      alert(S.copy.claim.failed);
+    });
+  }
+
+  // No visible countdown — the page just quietly reloads itself once the
+  // 06:00 IST cutover passes, so a phone left open overnight shows the new
+  // card instead of yesterday's. Server clock, not the device's.
+  function scheduleRollover(s) {
+    if (countTimer) clearInterval(countTimer);
+    var skew = Date.parse(s.serverNow) - Date.now();
+    var target = Date.parse(s.nextResetAt);
+    countTimer = setInterval(function () {
+      if (target - (Date.now() + skew) <= 0) { clearInterval(countTimer); load(); }
+    }, 30000);
+  }
+
+  function render(s) {
+    S = s;
+    document.title = s.copy.header.title + ' — AstroLokal';
+    if (s.drawn) renderReveal(s, {});   // drawn state persists all day, across re-opens
+    else renderFan(s);
+  }
+
+  function load() {
+    api(API.session + '?user_id=' + encodeURIComponent(USER_ID))
+      .then(render)
+      .catch(function (err) { renderError(err.copy); });
+  }
+
+  el('backBtn').onclick = function () {
+    var deeplink = S && S.nav && S.nav.backDeeplink;
+    if (history.length > 1) history.back();
+    else if (deeplink) location.href = deeplink;
+  };
+
+  load();
+})();
+</script>
+</body>
+</html>

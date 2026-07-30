@@ -1,0 +1,302 @@
+{
+  "experimentKey": "bhagya_card",
+
+  "streak": {
+    "length": 7,
+    "rewards": { "1": 10, "4": 20, "7": 50 }
+  },
+
+  "deck": {
+    "size": 15,
+    "minSize": 10,
+    "maxSize": 20,
+    "maxPerTheme": 3,
+    "recentTitleDays": 3,
+    "themes": ["money", "work", "home", "relationships", "journey", "self"],
+
+    "comment": "The fixed deck of 20 fortune cards. art_key + title + theme + numeral are the card's identity and never change — one illustration per art_key. Gemini picks which cards make today's deck and writes only their words; it can never invent a card name or an art key.",
+    "cards": [
+      { "art_key": "the_sun",         "title": "The Radiant Sun",     "theme": "self",          "numeral": "I" },
+      { "art_key": "the_star",        "title": "The Guiding Star",    "theme": "self",          "numeral": "II" },
+      { "art_key": "the_strength",    "title": "The Gentle Strength", "theme": "self",          "numeral": "III" },
+      { "art_key": "the_lantern",     "title": "The Lantern Bearer",  "theme": "self",          "numeral": "IV" },
+      { "art_key": "the_wheel",       "title": "The Turning Wheel",   "theme": "journey",       "numeral": "V" },
+      { "art_key": "the_chariot",     "title": "The Golden Chariot",  "theme": "journey",       "numeral": "VI" },
+      { "art_key": "the_world",       "title": "The Whole World",     "theme": "journey",       "numeral": "VII" },
+      { "art_key": "the_open_road",   "title": "The Open Road",       "theme": "journey",       "numeral": "VIII" },
+      { "art_key": "the_empress",     "title": "The Golden Empress",  "theme": "home",          "numeral": "IX" },
+      { "art_key": "the_full_home",   "title": "The Full Home",       "theme": "home",          "numeral": "X" },
+      { "art_key": "the_festive_gate","title": "The Festive Gate",    "theme": "home",          "numeral": "XI" },
+      { "art_key": "the_emperor",     "title": "The Steady Emperor",  "theme": "work",          "numeral": "XII" },
+      { "art_key": "the_skilled_hand","title": "The Skilled Hand",    "theme": "work",          "numeral": "XIII" },
+      { "art_key": "the_scales",      "title": "The Even Scales",     "theme": "work",          "numeral": "XIV" },
+      { "art_key": "the_lovers",      "title": "The Two Hearts",      "theme": "relationships", "numeral": "XV" },
+      { "art_key": "the_three_cups",  "title": "The Three Cups",      "theme": "relationships", "numeral": "XVI" },
+      { "art_key": "the_teacher",     "title": "The Wise Teacher",    "theme": "relationships", "numeral": "XVII" },
+      { "art_key": "the_golden_coin", "title": "The Golden Coin",     "theme": "money",         "numeral": "XVIII" },
+      { "art_key": "the_wish_cup",    "title": "The Wish Cup",        "theme": "money",         "numeral": "XIX" },
+      { "art_key": "the_harvest",     "title": "The Patient Harvest", "theme": "money",         "numeral": "XX" }
+    ]
+  },
+
+  "bannedWords": [
+    "guaranteed", "guarantee", "definitely", "certainly", "surely", "100%",
+    "death", "die", "dead", "illness", "disease", "sick", "accident",
+    "divorce", "court", "lawsuit", "legal", "pregnancy", "pregnant",
+    "danger", "dangerous", "beware", "warning", "curse", "evil",
+    "unlucky", "doom", "loss", "fail", "failure", "fear", "afraid",
+    "tarot"
+  ],
+
+  "consultTarget": {
+    "deeplink": "astrolokal://consult/chat"
+  },
+
+  "nav": {
+    "comment": "Back button: history.back() when there is history, otherwise this deeplink hands control back to the app shell.",
+    "backDeeplink": "astrolokal://home"
+  },
+
+  "art": {
+    "comment": "Placeholder card art ships inline in the client. Set baseUrl once the real illustrations exist and the client loads {baseUrl}/{art_key}.{ext} full-bleed inside the card frame — no code change.",
+    "baseUrl": null,
+    "ext": "png"
+  },
+
+  "astrologer": {
+    "name": "Pandit ji",
+    "avatarUrl": null
+  },
+
+  "coinCredit": {
+    "purpose": "refund",
+    "descriptionTemplate": "Bhagya Card streak reward {day}",
+    "source": "bhagya_card"
+  },
+
+  "copy": {
+    "header": {
+      "title": "Today's Fortune Card",
+      "eyebrow": "Today's Fortune Card"
+    },
+    "streak": {
+      "title": "7-Day Streak",
+      "progress": "Day {day} / {total}",
+      "nextReward": "{amount} coins on day {day}",
+      "complete": "All 7 days complete",
+      "todayLabel": "Today"
+    },
+    "draw": {
+      "prompt": "Draw today's card",
+      "hint": "Know what your card says about today",
+      "tap": "Tap any card to draw"
+    },
+    "reveal": {
+      "findingLabel": "Daily Insight"
+    },
+    "claim": {
+      "label": "You won",
+      "coins": "{amount} coins",
+      "button": "Claim",
+      "claiming": "Adding…",
+      "claimed": "Claimed",
+      "failed": "Coins could not be added. Please try again in a moment."
+    },
+    "consult": {
+      "cta": "Talk to an Astrologer"
+    },
+    "postStreak": "You have collected all your rewards. Keep drawing a card each day — your sign for the day will always be here.",
+    "blocked": {
+      "title": "Please log in",
+      "body": "Log in to the AstroLokal app and open Bhagya Card again to see today's card."
+    },
+    "error": {
+      "title": "A small hold-up",
+      "body": "Your card could not open. Please try once more.",
+      "retry": "Try again"
+    }
+  },
+
+  "sampleDeck": [
+    {
+      "title": "The Radiant Sun",
+      "art_key": "the_sun",
+      "theme": "self",
+      "fortune": [
+        "The clouds of the last few days are moving aside.",
+        "In the coming days your energy will feel new again."
+      ],
+      "finding": "Your strength is returning. Where to spend it first is the one thing this card leaves open.",
+      "consult_nudge": "Which work suits your energy right now — your kundli holds that answer.",
+      "prefill_question": "I got 'The Radiant Sun' card today — what does it mean for me?"
+    },
+    {
+      "title": "The Guiding Star",
+      "art_key": "the_star",
+      "theme": "self",
+      "fortune": [
+        "A hope you had almost put down will come back this week.",
+        "The way ahead is being lit, one step at a time."
+      ],
+      "finding": "Hope is coming back to you. Which hope is worth walking towards is still to be understood.",
+      "consult_nudge": "Which hope your stars are backing now — a pandit ji reads it in your kundli.",
+      "prefill_question": "I got 'The Guiding Star' card today — what does it mean for my future?"
+    },
+    {
+      "title": "The Gentle Strength",
+      "art_key": "the_strength",
+      "theme": "self",
+      "fortune": [
+        "A matter that felt heavy will start feeling lighter.",
+        "Your calm will do more this week than your speed."
+      ],
+      "finding": "You are stronger in this matter than you think. Where to use that calm is the open question.",
+      "consult_nudge": "Where your patience will pay the most — your kundli points to it. Ask a pandit ji.",
+      "prefill_question": "I got 'The Gentle Strength' card today — what does it mean for me?"
+    },
+    {
+      "title": "The Turning Wheel",
+      "art_key": "the_wheel",
+      "theme": "journey",
+      "fortune": [
+        "The time that had slowed down is about to turn.",
+        "What you started long back will move again this week."
+      ],
+      "finding": "Your time is turning in your favour. How far this turn takes you is still to be read.",
+      "consult_nudge": "How long this good phase runs for you is written in your kundli — ask and know.",
+      "prefill_question": "I got 'The Turning Wheel' card today — how will my coming time be?"
+    },
+    {
+      "title": "The Golden Chariot",
+      "art_key": "the_chariot",
+      "theme": "journey",
+      "fortune": [
+        "A journey or a change of place is taking shape.",
+        "The reins are in your hands this week."
+      ],
+      "finding": "Movement is coming — a trip, a move, or a change. Which direction is right is still open.",
+      "consult_nudge": "Which direction is lucky for you — your kundli says it clearly. Ask a pandit ji.",
+      "prefill_question": "I got 'The Golden Chariot' card today — what does it mean for travel?"
+    },
+    {
+      "title": "The Golden Empress",
+      "art_key": "the_empress",
+      "theme": "home",
+      "fortune": [
+        "Warmth is returning to your home in the coming days.",
+        "Something you cared for is ready to bloom."
+      ],
+      "finding": "Care you gave at home is about to come back to you. What it blooms into is still to be seen.",
+      "consult_nudge": "What your home is ready to receive now — a pandit ji reads it in your kundli.",
+      "prefill_question": "I got 'The Golden Empress' card today — what does it mean for my home?"
+    },
+    {
+      "title": "The Full Home",
+      "art_key": "the_full_home",
+      "theme": "home",
+      "fortune": [
+        "A family matter will settle more easily than you expect.",
+        "This week the house will feel fuller than before."
+      ],
+      "finding": "The house is moving towards peace. Who takes the first step is what this card leaves open.",
+      "consult_nudge": "Who should make the first move at home — your kundli points to it clearly.",
+      "prefill_question": "I got 'The Full Home' card today — what does it mean for my family?"
+    },
+    {
+      "title": "The Steady Emperor",
+      "art_key": "the_emperor",
+      "theme": "work",
+      "fortune": [
+        "Your steady work is being noticed more than you know.",
+        "In the coming days your word will carry weight."
+      ],
+      "finding": "Your standing at work is rising quietly. Where to use that voice is the open question.",
+      "consult_nudge": "When to speak up at work — the right moment is marked in your kundli.",
+      "prefill_question": "I got 'The Steady Emperor' card today — what does it mean for my work?"
+    },
+    {
+      "title": "The Skilled Hand",
+      "art_key": "the_skilled_hand",
+      "theme": "work",
+      "fortune": [
+        "The skill you keep practising is close to paying you back.",
+        "One more round of effort and it will show."
+      ],
+      "finding": "Your craft is nearly ready to be seen. Which door to knock on first is still to be understood.",
+      "consult_nudge": "Which door will open for your skill — your kundli holds it. Ask a pandit ji.",
+      "prefill_question": "I got 'The Skilled Hand' card today — what does it mean for my career?"
+    },
+    {
+      "title": "The Even Scales",
+      "art_key": "the_scales",
+      "theme": "work",
+      "fortune": [
+        "A matter that felt one-sided will find its balance.",
+        "What is fair will come back to you this week."
+      ],
+      "finding": "Balance is returning to a matter you carry. When it settles is what this card leaves open.",
+      "consult_nudge": "When this matter settles for you — that timing lives in your kundli.",
+      "prefill_question": "I got 'The Even Scales' card today — what does it mean for my work matter?"
+    },
+    {
+      "title": "The Two Hearts",
+      "art_key": "the_lovers",
+      "theme": "relationships",
+      "fortune": [
+        "A closeness you were unsure about will feel steady again.",
+        "In the coming days one honest talk will change a lot."
+      ],
+      "finding": "A relationship is asking for one honest talk. When to have it is the question this leaves.",
+      "consult_nudge": "The right time to open your heart — a pandit ji reads it in your kundli.",
+      "prefill_question": "I got 'The Two Hearts' card today — what does it mean for my relationship?"
+    },
+    {
+      "title": "The Three Cups",
+      "art_key": "the_three_cups",
+      "theme": "relationships",
+      "fortune": [
+        "Good news in the family will bring people together.",
+        "This week a small celebration is on its way."
+      ],
+      "finding": "A happy occasion is forming around you. What it will be about is still to be seen.",
+      "consult_nudge": "What joy your stars are preparing — your kundli says it. Ask a pandit ji.",
+      "prefill_question": "I got 'The Three Cups' card today — what good news is coming?"
+    },
+    {
+      "title": "The Golden Coin",
+      "art_key": "the_golden_coin",
+      "theme": "money",
+      "fortune": [
+        "A new source of income is taking shape near you.",
+        "In the coming days a small offer will come your way."
+      ],
+      "finding": "A fresh money opening is close. Whether to take it or wait is the question this leaves.",
+      "consult_nudge": "Take it or wait — your kundli tells you which one is right for you.",
+      "prefill_question": "I got 'The Golden Coin' card today — what does it mean for my money?"
+    },
+    {
+      "title": "The Wish Cup",
+      "art_key": "the_wish_cup",
+      "theme": "money",
+      "fortune": [
+        "Something you have wished for quietly is coming closer.",
+        "This week your saving will feel worth it."
+      ],
+      "finding": "A wish you have held is moving nearer. What has to be done for it is still to be understood.",
+      "consult_nudge": "What your wish is waiting on — a pandit ji reads that from your kundli.",
+      "prefill_question": "I got 'The Wish Cup' card today — will my wish come true?"
+    },
+    {
+      "title": "The Patient Harvest",
+      "art_key": "the_harvest",
+      "theme": "money",
+      "fortune": [
+        "What you planted months ago is ready to be counted.",
+        "Patience is about to give you its fruit."
+      ],
+      "finding": "Your slow saving is close to being useful. When to use it is what this card leaves open.",
+      "consult_nudge": "When to use what you saved — the right time is written in your kundli.",
+      "prefill_question": "I got 'The Patient Harvest' card today — what does it mean for my savings?"
+    }
+  ]
+}
