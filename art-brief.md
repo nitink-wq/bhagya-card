@@ -1,5 +1,14 @@
 # Bhagya Card — illustration brief (for an image-generation model)
 
+> **STATUS (2026-07-30): art generated & deck finalized at 12 cards.**
+> The kept keys are: the_sun, the_star, the_wheel, the_chariot, the_world,
+> the_open_road, the_empress (re-themed **money**), the_full_home,
+> the_festive_gate, the_emperor, the_skilled_hand, the_three_cups.
+> The other 8 (strength, lantern, scales, lovers, teacher, golden_coin,
+> wish_cup, harvest) were dropped from the catalogue — do not generate them.
+> Save the 12 finals as `public/art/{art_key}.png` (see public/art/README.md);
+> this brief is kept for regenerating a card or extending the deck later.
+
 ## Technical spec (fixed — every card identical)
 
 | Property | Value |

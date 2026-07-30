@@ -10,13 +10,14 @@ config-driven copy, fire-once wallet credits, self-scheduling daily content).
 
 ## Mechanics
 
-- **A fixed deck of 20 fortune cards.** `deck.cards` in the config is the
-  catalogue: `art_key` + `title` + `theme` + `numeral` are a card's identity and
-  never change, so there is exactly one illustration per card, forever. Gemini
-  chooses which 15 make today's deck and writes only their words — it can never
-  invent a card we have no artwork for. Adding a card = one catalogue entry plus
-  one illustration. (We say *fortune card*, never *tarot* — `tarot` is on the
-  banned-word list.)
+- **A fixed deck of 12 illustrated fortune cards.** `deck.cards` in the config
+  is the catalogue: `art_key` + `title` + `theme` + `numeral` are a card's
+  identity and never change, so there is exactly one illustration per card,
+  forever (`public/art/{art_key}.png`). The daily deck is the whole catalogue;
+  Gemini rewrites only the words each night — it can never invent a card we
+  have no artwork for. The Golden Empress carries the money theme (abundance).
+  Adding a card = one catalogue entry plus one illustration. (We say *fortune
+  card*, never *tarot* — `tarot` is on the banned-word list.)
 - **One card draw per product day.** The user taps one of three face-down
   cards; the revealed card is the seeded deck pick
   (`sha256(user_id + day) % deck size`) — stable across re-opens, different
@@ -43,7 +44,7 @@ config-driven copy, fire-once wallet credits, self-scheduling daily content).
 | DB | Any Postgres-compliant database via `pg` + one `DATABASE_URL` |
 | Migrations | `node-pg-migrate` (official node-postgres tool) — run-once per deploy |
 | Client | Single static `public/index.html` (vanilla JS, inline CSS/SVG art) |
-| AI content | Gemini REST (`gemini-2.5-flash`), nightly deck of ~15 cards |
+| AI content | Gemini REST (`gemini-2.5-flash`), nightly words for the 12-card deck |
 | Deploy | Docker (arm64 on Devtron), Kubernetes-ready stateless pods |
 
 ## Design
@@ -89,11 +90,13 @@ it: CTA and Claim are `#F45722` with `#FA9C70` as the pressed state; panels
 - **One CTA, ever.** "Talk to an Astrologer" lives at the end of the story; the
   fixed bottom bar is the same button re-offered once that one scrolls out of
   view (IntersectionObserver), so two are never on screen together.
-- **Illustrations** — 20 hand-built placeholder SVGs, one per `art_key`, drawn
-  in the brand palette and shown inside the card frame. To swap in real art, set
-  `art.baseUrl` in the config: the client then loads `{baseUrl}/{art_key}.{ext}`
-  full-bleed and drops its own frame furniture (ticks, numeral, inner plate),
-  since a real illustration brings its own composition. No code change.
+- **Illustrations** — the 12 finals ship in `public/art/{art_key}.png`
+  (config `art.baseUrl: "art"`; point it at a CDN to serve from elsewhere).
+  The client loads them full-bleed and drops its own frame furniture (ticks,
+  numeral, inner plate), since the illustrations bring their own borders. If a
+  file fails to load it falls back to the inline placeholder emblem — a broken
+  image can never appear on the hero card. See `public/art/README.md` for the
+  filename contract and `art-brief.md` for regenerating/extending the set.
 - **Logo** — `public/logo.png` carries real alpha (the original opaque copy is
   kept at `logo-opaque.png`), so it sits directly on the gradient with no
   plate. It also carries ~10% transparent padding on every side, so the nav
@@ -178,15 +181,15 @@ Self-scheduling, no CronJob: every pod ensures today's deck at boot, every
 cutover flips onto content that already exists instead of making the first
 morning visitor wait on a Gemini call.
 
-Pipeline validation (never trust the model): 10–20 cards, every `art_key` from
+Pipeline validation (never trust the model): 10–12 cards, every `art_key` from
 the catalogue with its `title` and `theme` copied verbatim, no duplicate
 `art_key`, no theme more than 3×, `prefill_question` names the title verbatim,
 per-field length caps, banned-word + valence lint. **Failure mode = serve
 yesterday's deck**, then the config `sampleDeck` — stale beats broken.
 
-`recentTitleDays` is a prompt *preference*, not a reject: with a fixed 20-card
-catalogue and a 15-card deck, demanding no overlap with the last 3 days would be
-unsatisfiable. Freshness comes from the words, which are rewritten daily.
+With the deck being the full 12-card catalogue every day, `recentTitleDays` is
+0 — the same cards appear daily by design; freshness comes from the words,
+which are rewritten every night.
 
 Art is never generated: a card's `art_key` indexes the fixed illustration set.
 

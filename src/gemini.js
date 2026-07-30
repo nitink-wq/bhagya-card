@@ -32,13 +32,21 @@ function buildPrompt(cfg, day, recentTitles) {
   const catalogue = d.cards
     .map((c) => `  ${c.art_key} | "${c.title}" | ${c.theme}`)
     .join('\n');
+  // With size == catalogue length the whole deck ships daily and the model
+  // only writes words; with a smaller size it also chooses which cards.
+  const picksAll = d.size >= d.cards.length;
+  const recentLine = recentTitles.length
+    ? `\nCards used in the last ${d.recentTitleDays} days (prefer different ones): ${recentTitles.join(', ')}`
+    : '';
   return `SYSTEM:
 You write the daily words for AstroLokal's Fortune Cards — a fixed deck of
 ${d.cards.length} illustrated cards read by tier-2/3 Indian users.
 Output strict JSON only, no markdown.
 
-THE DECK IS FIXED. You choose WHICH cards are in today's deck and write their
-words. You never invent a card, a name, a theme or an art key. Copy art_key,
+THE DECK IS FIXED. ${picksAll
+    ? 'You write fresh words for every card in the catalogue below.'
+    : 'You choose WHICH cards are in today\'s deck and write their words.'}
+You never invent a card, a name, a theme or an art key. Copy art_key,
 title and theme verbatim from this catalogue:
 ${catalogue}
 
@@ -50,8 +58,8 @@ in Indian English are welcome (kundli, pandit ji, kalash, rangoli, diya).
 
 HARD RULES:
 - The words must fit the card's own symbol — The Radiant Sun speaks of light and
-  returning energy, The Patient Harvest of a slow saving ripening. Never write
-  words that would sit oddly under that illustration.
+  returning energy, The Golden Empress of quiet abundance and money growing.
+  Never write words that would sit oddly under that illustration.
 - Call these "fortune cards". Never use the word tarot, and never use tarot
   vocabulary (arcana, spread, reversed, suits, querent).
 - Every card is positive or neutral. A card may name a tension (a choice, a wait,
@@ -75,9 +83,11 @@ HARD RULES:
   pregnancy themes; no absolutes ("zaroor", "pakka", "100%"); no fear words.
 
 USER:
-Pick ${d.size} cards from the catalogue for ${day} and write their words:
+${picksAll
+    ? `Write today's words for all ${d.cards.length} catalogue cards for ${day}:`
+    : `Pick ${d.size} cards from the catalogue for ${day} and write their words:`}
 ${SCHEMA_EXAMPLE}
-No theme more than ${d.maxPerTheme} times. Cards used in the last ${d.recentTitleDays} days (pick different ones): ${recentTitles.length ? recentTitles.join(', ') : '(none)'}
+No theme more than ${d.maxPerTheme} times.${recentLine}
 Return one JSON object. Nothing else.`;
 }
 
