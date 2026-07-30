@@ -158,7 +158,7 @@
   "copy": {
     "header": {
       "title": "Today's Fortune Card",
-      "eyebrow": "Today's Fortune Card"
+      "subtitle": "Daily Fortune Card"
     },
     "streak": {
       "title": "7-Day Streak",

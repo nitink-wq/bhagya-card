@@ -78,7 +78,14 @@
   }
   .nav .back:active { background: var(--panel-deep); }
   .nav .back svg { width: 19px; height: 19px; }
-  .nav .brand { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .nav .brand { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .nav .brandRow { display: flex; align-items: center; gap: 6px; }
+  .nav .sub {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--gold-deep);
+    /* reserve the line so the nav doesn't grow when the copy arrives */
+    min-height: 13px;
+  }
   /* logo.png carries ~10% transparent padding on every side; crop it away so
      the mark sits tight against the wordmark instead of floating off it */
   .nav .markBox { width: 26px; height: 26px; overflow: hidden; flex: none; }
@@ -86,10 +93,6 @@
   .nav .word { font-family: var(--serif); font-weight: 700; font-size: 19px; color: var(--ink); letter-spacing: -.01em; }
 
   /* ---- shared bits -------------------------------------------------------- */
-  .eyebrow {
-    font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
-    color: var(--gold-deep); text-align: center;
-  }
   .hidden { display: none !important; }
 
   /* ---- pre-draw: one job on the page, nothing else -------------------------
@@ -360,7 +363,10 @@
       <svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#35200F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="brand">
-      <span class="markBox"><img src="logo.png" alt=""></span><span class="word">AstroLokal</span>
+      <span class="brandRow">
+        <span class="markBox"><img src="logo.png" alt=""></span><span class="word">AstroLokal</span>
+      </span>
+      <span class="sub" id="navSub"></span>
     </div>
     <span></span>
   </div>
@@ -621,7 +627,8 @@
     el('main').innerHTML =
       '<div class="predraw">' +
       '<div class="intro">' +
-        '<div class="eyebrow">' + esc(s.copy.header.eyebrow) + '</div>' +
+        // no eyebrow here — the nav subheader already says "Daily Fortune
+        // Card" a few px above; repeating it read as a stutter
         '<h1>' + esc(s.copy.draw.prompt) + '</h1>' +
         '<p>' + esc(s.copy.draw.hint) + '</p>' +
       '</div>' +
@@ -805,6 +812,7 @@
   function render(s) {
     S = s;
     document.title = s.copy.header.title + ' — AstroLokal';
+    el('navSub').textContent = s.copy.header.subtitle || '';
     if (s.drawn) renderReveal(s, {});   // drawn state persists all day, across re-opens
     else renderFan(s);
   }
