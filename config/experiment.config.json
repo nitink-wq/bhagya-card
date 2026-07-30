@@ -141,9 +141,9 @@
     "backDeeplink": "astrolokal://home"
   },
   "art": {
-    "comment": "The 12 real illustrations live in public/art/{art_key}.png, served by the app itself (baseUrl 'art' is relative). Point baseUrl at a CDN instead to serve them from elsewhere. If a file is missing the client falls back to its inline placeholder emblem.",
+    "comment": "The 12 real illustrations live in public/art/{art_key}.jpg (704x1056, q82 — resized from the 1024x1536 masters), served by the app itself (baseUrl 'art' is relative). Point baseUrl at a CDN instead to serve them from elsewhere. If a file is missing the client falls back to its inline placeholder emblem.",
     "baseUrl": "art",
-    "ext": "png"
+    "ext": "jpg"
   },
   "astrologer": {
     "name": "Pandit ji",

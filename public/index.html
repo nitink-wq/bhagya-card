@@ -146,8 +146,13 @@
     content: ""; position: absolute; inset: 14px; border-radius: 7px;
     border: 1px solid rgba(197, 124, 34, .22); pointer-events: none;
   }
-  /* real full-bleed art brings its own composition — drop our furniture */
+  /* Real art brings its own composition AND its own painted border, so drop
+     every piece of our furniture — including the gold-foil frame itself.
+     Wrapping an illustrated border in a second frame reads as a double frame
+     and steals width from the artwork. */
   .fcard.photo .inner::after, .fcard.photo .tick, .fcard.photo .num { display: none; }
+  .fcard.photo { padding: 0; background: none; border-radius: 18px; }
+  .fcard.photo .inner { border-radius: 18px; box-shadow: none; background: none; }
   /* inner corner ticks — the deck's signature, mirrors the app's card motif */
   .fcard .tick { position: absolute; width: 12px; height: 12px; border: 1.5px solid rgba(197, 124, 34, .45); }
   .fcard .t1 { top: 7px; left: 7px; border-right: 0; border-bottom: 0; }

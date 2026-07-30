@@ -1,27 +1,53 @@
 # Card illustrations
 
-Drop the 12 final illustrations in this folder with **exactly** these names
-(the config's `art.baseUrl: "art"` makes the app serve them from here):
+The 12 final illustrations, served by the app itself
+(`art.baseUrl: "art"` in `config/experiment.config.json` makes this folder
+the source; `art.ext: "jpg"` picks the extension).
 
-| file | card |
-|---|---|
-| `the_sun.png` | The Radiant Sun |
-| `the_star.png` | The Guiding Star |
-| `the_wheel.png` | The Turning Wheel |
-| `the_chariot.png` | The Golden Chariot |
-| `the_world.png` | The Whole World |
-| `the_open_road.png` | The Open Road |
-| `the_empress.png` | The Golden Empress |
-| `the_full_home.png` | The Full Home |
-| `the_festive_gate.png` | The Festive Gate |
-| `the_emperor.png` | The Steady Emperor |
-| `the_skilled_hand.png` | The Skilled Hand |
-| `the_three_cups.png` | The Three Cups |
+| file | card | theme |
+|---|---|---|
+| `the_sun.jpg` | The Radiant Sun | self |
+| `the_star.jpg` | The Guiding Star | self |
+| `the_wheel.jpg` | The Turning Wheel | journey |
+| `the_chariot.jpg` | The Golden Chariot | journey |
+| `the_world.jpg` | The Whole World | journey |
+| `the_open_road.jpg` | The Open Road | journey |
+| `the_empress.jpg` | The Golden Empress | money |
+| `the_full_home.jpg` | The Full Home | home |
+| `the_festive_gate.jpg` | The Festive Gate | home |
+| `the_emperor.jpg` | The Steady Emperor | work |
+| `the_skilled_hand.jpg` | The Skilled Hand | work |
+| `the_three_cups.jpg` | The Three Cups | relationships |
 
-Source images are 1024×1536 (2:3); the client shows them full-bleed at
-204×316 inside the gold frame. If a file is missing the client falls back to
-its inline placeholder emblem, so a partial upload never breaks the page —
-but ship all 12 together so the deck looks consistent.
+## Encoding
 
-To serve from a CDN instead, upload the same files there and change
-`art.baseUrl` in `config/experiment.config.json`.
+Shipped as **704 × 1056 JPEG, quality 82** (~285–410 KB each), resized from
+the 1024 × 1536 PNG masters (~3 MB each). The card renders at 204 × 316 CSS
+px, so 704 px wide still covers a 3× display with headroom, and JPEG is the
+right format for painterly art — the PNG masters were ~10× larger for no
+visible gain at this size.
+
+Only **one** image ever loads per user per day (they draw one card), so the
+deck's size on disk is never a page-weight cost.
+
+Regenerate from the masters with:
+
+```bash
+for f in /path/to/masters/*.png; do
+  sips -s format jpeg -s formatOptions 82 -Z 1056 "$f" \
+    --out "public/art/$(basename "$f" .png).jpg"
+done
+```
+
+## Notes
+
+- These illustrations carry **their own painted border**, so the client drops
+  its gold-foil frame in photo mode (`.fcard.photo`) — otherwise it reads as a
+  frame inside a frame.
+- If a file is missing the client falls back to its inline placeholder emblem,
+  so a partial upload never breaks the page — but ship all 12 together so the
+  deck looks consistent.
+- A card's `art_key` is permanent. To re-illustrate a card, replace the file
+  at the same name.
+- To serve from a CDN instead, upload the same files there and change
+  `art.baseUrl`.
