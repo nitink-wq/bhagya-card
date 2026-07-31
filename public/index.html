@@ -788,8 +788,12 @@
     }, reduce ? 0 : 700);   // let the card finish dealing in first
   }
 
+  // The CTA performs a back action (same as the back arrow): the app shell
+  // that opened this webview owns what happens next. The old consult deeplink
+  // is no longer navigated to; clicks are intercepted by the delegated
+  // handler below.
   function ctaHtml(s) {
-    return '<a class="cta" id="inlineCta" href="' + esc(s.card.consultUrl) + '">' +
+    return '<a class="cta" id="inlineCta" href="#">' +
       CHAT_ICON + esc(s.copy.consult.cta) + '</a>';
   }
 
@@ -877,11 +881,22 @@
       .catch(function (err) { renderError(err.copy); });
   }
 
-  el('backBtn').onclick = function () {
+  // Back action, shared by the back arrow and the CTA: go back in webview
+  // history when there is any, otherwise hand control to the app shell via
+  // the deeplink (without it a first-page-in-webview tap would do nothing).
+  function goBack() {
     var deeplink = S && S.nav && S.nav.backDeeplink;
     if (history.length > 1) history.back();
     else if (deeplink) location.href = deeplink;
-  };
+  }
+  el('backBtn').onclick = goBack;
+  // Delegated: the CTA is re-rendered on every state change and exists twice
+  // (inline + sticky bar), so one listener on the document covers them all.
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    while (t && t !== document && !(t.classList && t.classList.contains('cta'))) t = t.parentNode;
+    if (t && t !== document) { e.preventDefault(); goBack(); }
+  });
 
   load();
 })();
