@@ -13,7 +13,10 @@ const CONFIG_PATH =
 
 const CARD_FIELD_LIMITS = {
   title: 24,
-  fortuneLine: 90,
+  // The two fortune lines are the whole on-screen insight, so they get a
+  // little more room than a headline would — but stay capped, because the
+  // card has to read in one glance on a small phone.
+  fortuneLine: 115,
   finding: 140,
   consult_nudge: 110,
   prefill_question: 120,

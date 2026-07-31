@@ -81,10 +81,10 @@
   .nav .brand { display: flex; flex-direction: column; align-items: center; gap: 3px; }
   .nav .brandRow { display: flex; align-items: center; gap: 6px; }
   .nav .sub {
-    font-size: 10.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    font-size: 13px; font-weight: 600; letter-spacing: .01em;
     color: var(--gold-deep);
     /* reserve the line so the nav doesn't grow when the copy arrives */
-    min-height: 13px;
+    min-height: 16px;
   }
   /* logo.png carries ~10% transparent padding on every side; crop it away so
      the mark sits tight against the wordmark instead of floating off it */
@@ -188,7 +188,7 @@
     background: linear-gradient(180deg, rgba(255, 255, 255, .74) 0%, rgba(255, 255, 255, .40) 100%);
     box-shadow: 0 16px 36px -20px rgba(122, 72, 36, .55);
   }
-  .stage .fcard { width: 204px; height: 316px; }
+  .stage .fcard { width: 186px; height: 288px; }
   /* the deal only plays on the draw itself — a claim or a re-open must not
      replay it, or the page looks like it reloaded under the user */
   .fresh .stage .fcard { animation: dealIn .62s cubic-bezier(.2, .9, .3, 1.1) both; }
@@ -209,16 +209,11 @@
   }
   .fresh .story { animation: rise .5s .12s cubic-bezier(.2, .8, .3, 1) both; }
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-  .story h2 { font-size: 27px; font-weight: 700; letter-spacing: -.015em; line-height: 1.2; }
-  .story .chip {
-    display: inline-block; margin-top: 11px; padding: 6px 14px; border-radius: 999px;
-    font-size: 11.5px; font-weight: 700; letter-spacing: .03em; color: var(--ink-soft);
-    background: var(--sand); box-shadow: inset 0 0 0 1px rgba(197, 124, 34, .14);
-  }
+  .story h2 { font-size: 26px; font-weight: 700; letter-spacing: -.015em; line-height: 1.2; }
   /* one insight, balanced so every line wraps to a similar width */
   .insight {
-    margin: 16px auto 0; max-width: 34ch; text-wrap: balance;
-    font-size: 16.5px; line-height: 1.66; color: var(--ink);
+    margin: 14px auto 0; max-width: 34ch; text-wrap: balance;
+    font-size: 16px; line-height: 1.62; color: var(--ink);
   }
   .note { margin: 12px auto 0; max-width: 32ch; text-wrap: balance; font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
 
@@ -340,6 +335,45 @@
   @media (prefers-reduced-motion: reduce) {
     .coinFx { display: none; }
     .claimBar.paid { animation-duration: .01s; animation-delay: 0s; }
+  }
+
+  /* ---- small phones (360px and under: SE, Go-edition, older budget Androids)
+     Everything above is sized for a 375-430px screen. Here the card, the
+     streak track and the type all step down together so nothing has to wrap
+     awkwardly or push the layout sideways. */
+  @media (max-width: 360px) {
+    .wrap { padding-left: 13px; padding-right: 13px; }
+    .nav .word { font-size: 17.5px; }
+    .nav .sub { font-size: 12px; }
+
+    .intro h1 { font-size: 25px; }
+    .intro p { font-size: 14px; }
+    .fan { height: 272px; }
+    .slot .fcard { width: 112px; height: 174px; }
+    .fan .slot:nth-child(1) { transform: rotate(-14deg) translate(-70px, 13px); }
+    .fan .slot:nth-child(3) { transform: rotate(14deg) translate(70px, 13px); }
+    .tapHint { font-size: 13px; }
+
+    .streak { padding: 10px 11px 11px; }
+    .sHead h3 { font-size: 13.5px; }
+    .node, .node .dot { width: 22px; }
+    .node .dot { height: 22px; font-size: 10.5px; }
+    .link { margin-top: 10px; }
+    .claimBar { gap: 8px; padding-left: 8px; }
+    .claimBar .coinIcon { width: 22px; height: 22px; }
+    .claimBar .lbl { font-size: 11.5px; }
+    .claimBar .val { font-size: 14px; }
+    .claimBar button { padding: 9px 14px; font-size: 13px; }
+
+    .stage .plate { padding: 14px 16px; }
+    .stage .fcard { width: 168px; height: 260px; }
+    .story { padding: 56px 12px 18px; }
+    .story h2 { font-size: 23px; }
+    .insight { font-size: 15px; }
+    .astro { gap: 9px; margin-top: 22px; }
+    .astro .avatar, .astro .avatar svg, .astro .avatar img { width: 42px; height: 42px; }
+    .astro .bubble { font-size: 13.5px; padding: 10px 12px; }
+    .cta { font-size: 15.5px; padding: 15px; }
   }
 
   /* ---- fallbacks ---------------------------------------------------------- */
@@ -713,7 +747,6 @@
       '</div></div>' +
       '<div class="story">' +
         '<h2>' + esc(c.title) + '</h2>' +
-        '<span class="chip">' + esc(s.copy.reveal.findingLabel) + '</span>' +
         // ONE insight, not two near-identical paragraphs: the card speaks in
         // its fortune lines; the finding's open question lives in the
         // astrologer bubble below, where it belongs.

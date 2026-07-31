@@ -131,7 +131,9 @@
     "failure",
     "fear",
     "afraid",
-    "tarot"
+    "tarot",
+    "kundli",
+    "pandit"
   ],
   "consultTarget": {
     "deeplink": "astrolokal://consult/chat"
@@ -172,9 +174,6 @@
       "hint": "Know what your card says about today",
       "tap": "Tap any card to draw"
     },
-    "reveal": {
-      "findingLabel": "Daily Insight"
-    },
     "claim": {
       "label": "You won",
       "coins": "{amount} coins",
@@ -203,11 +202,11 @@
       "art_key": "the_sun",
       "theme": "self",
       "fortune": [
-        "The clouds of the last few days are moving aside.",
-        "In the coming days your energy will feel new again."
+        "The clouds of the last few days are quietly moving aside for you.",
+        "In the coming days your energy will feel new again, and lighter."
       ],
       "finding": "Your strength is returning. Where to spend it first is the one thing this card leaves open.",
-      "consult_nudge": "Which work suits your energy right now — your kundli holds that answer.",
+      "consult_nudge": "Which work truly deserves this new energy — ask and know.",
       "prefill_question": "I got 'The Radiant Sun' card today — what does it mean for me?"
     },
     {
@@ -215,11 +214,11 @@
       "art_key": "the_star",
       "theme": "self",
       "fortune": [
-        "A hope you had almost put down will come back this week.",
-        "The way ahead is being lit, one step at a time."
+        "A hope you had almost put down is going to come back to you this week.",
+        "The way ahead is being lit for you, gently, one small step at a time."
       ],
       "finding": "Hope is coming back to you. Which hope is worth walking towards is still to be understood.",
-      "consult_nudge": "Which hope your stars are backing now — a pandit ji reads it in your kundli.",
+      "consult_nudge": "Which hope is truly worth walking towards — ask and know.",
       "prefill_question": "I got 'The Guiding Star' card today — what does it mean for my future?"
     },
     {
@@ -227,11 +226,11 @@
       "art_key": "the_wheel",
       "theme": "journey",
       "fortune": [
-        "The time that had slowed down is about to turn.",
-        "What you started long back will move again this week."
+        "The time that had slowed down for a while is about to turn again.",
+        "What you started long back will begin to move once more this week."
       ],
       "finding": "Your time is turning in your favour. How far this turn takes you is still to be read.",
-      "consult_nudge": "How long this good phase runs for you is written in your kundli — ask and know.",
+      "consult_nudge": "How far this turning time will carry you — ask and know.",
       "prefill_question": "I got 'The Turning Wheel' card today — how will my coming time be?"
     },
     {
@@ -239,11 +238,11 @@
       "art_key": "the_chariot",
       "theme": "journey",
       "fortune": [
-        "A journey or a change of place is taking shape.",
-        "The reins are in your hands this week."
+        "A journey or a change of place is quietly taking shape around you.",
+        "The reins are in your own hands this week, more than you realise."
       ],
       "finding": "Movement is coming — a trip, a move, or a change. Which direction is right is still open.",
-      "consult_nudge": "Which direction is lucky for you — your kundli says it clearly. Ask a pandit ji.",
+      "consult_nudge": "Which direction is truly yours to take — ask and know.",
       "prefill_question": "I got 'The Golden Chariot' card today — what does it mean for travel?"
     },
     {
@@ -251,11 +250,11 @@
       "art_key": "the_world",
       "theme": "journey",
       "fortune": [
-        "Your name is travelling further than your feet.",
-        "This week your work will reach people you have not met."
+        "Your name is travelling much further than your feet ever will.",
+        "This week your work will reach good people you have never met."
       ],
       "finding": "Your world is quietly growing bigger. Which new door matters most is still to be read.",
-      "consult_nudge": "Which new door is truly yours — a pandit ji reads it in your kundli.",
+      "consult_nudge": "Which new door is truly yours — ask and know.",
       "prefill_question": "I got 'The Whole World' card today — what new chance is coming to me?"
     },
     {
@@ -263,11 +262,11 @@
       "art_key": "the_open_road",
       "theme": "journey",
       "fortune": [
-        "A path that felt closed is quietly opening.",
-        "One clear step ahead will show itself this week."
+        "A path that felt closed for a long time is quietly opening again.",
+        "One clear step ahead will show itself to you in the coming days."
       ],
       "finding": "A way forward is opening for you. Whether to step now or wait a little is the open question.",
-      "consult_nudge": "The right time to take the step — your kundli marks it clearly.",
+      "consult_nudge": "When the right moment to step forward arrives — ask and know.",
       "prefill_question": "I got 'The Open Road' card today — is this the right time to move ahead?"
     },
     {
@@ -275,11 +274,11 @@
       "art_key": "the_empress",
       "theme": "money",
       "fortune": [
-        "What you save is quietly starting to grow.",
-        "In the coming days money will feel a little lighter."
+        "What you have been saving quietly is finally starting to grow.",
+        "In the coming days money matters will begin to feel lighter."
       ],
       "finding": "Abundance is gathering around you. Where to let it flow first is what this card leaves open.",
-      "consult_nudge": "Where your money grows best right now — your kundli holds that answer.",
+      "consult_nudge": "Where what you have will grow the best — ask and know.",
       "prefill_question": "I got 'The Golden Empress' card today — what does it mean for my money?"
     },
     {
@@ -287,11 +286,11 @@
       "art_key": "the_full_home",
       "theme": "home",
       "fortune": [
-        "A family matter will settle more easily than you expect.",
-        "This week the house will feel fuller than before."
+        "A family matter will settle far more easily than you are expecting.",
+        "This week your house will feel fuller and warmer than it has in a while."
       ],
       "finding": "The house is moving towards peace. Who takes the first step is what this card leaves open.",
-      "consult_nudge": "Who should make the first move at home — your kundli points to it clearly.",
+      "consult_nudge": "Who should make the first move at home — ask and know.",
       "prefill_question": "I got 'The Full Home' card today — what does it mean for my family?"
     },
     {
@@ -299,11 +298,11 @@
       "art_key": "the_festive_gate",
       "theme": "home",
       "fortune": [
-        "A happy occasion is preparing to enter your home.",
-        "Keep the doorway ready — good news is walking towards it."
+        "A happy occasion is quietly preparing to enter your home again.",
+        "Keep the doorway ready — good news is already walking towards it."
       ],
       "finding": "Something worth celebrating is forming near your family. What shape it takes is still to be seen.",
-      "consult_nudge": "What celebration your home is due for — your kundli hints at it.",
+      "consult_nudge": "What your home is truly being prepared for — ask and know.",
       "prefill_question": "I got 'The Festive Gate' card today — what good news is coming home?"
     },
     {
@@ -311,11 +310,11 @@
       "art_key": "the_emperor",
       "theme": "work",
       "fortune": [
-        "Your steady work is being noticed more than you know.",
-        "In the coming days your word will carry weight."
+        "Your steady work is being noticed by far more people than you know.",
+        "In the coming days your word will carry real weight where it matters."
       ],
       "finding": "Your standing at work is rising quietly. Where to use that voice is the open question.",
-      "consult_nudge": "When to speak up at work — the right moment is marked in your kundli.",
+      "consult_nudge": "When your voice will count the most — ask and know.",
       "prefill_question": "I got 'The Steady Emperor' card today — what does it mean for my work?"
     },
     {
@@ -323,11 +322,11 @@
       "art_key": "the_skilled_hand",
       "theme": "work",
       "fortune": [
-        "The skill you keep practising is close to paying you back.",
-        "One more round of effort and it will show."
+        "The skill you keep practising quietly is close to paying you back.",
+        "One more honest round of effort and the result will begin to show."
       ],
       "finding": "Your craft is nearly ready to be seen. Which door to knock on first is still to be understood.",
-      "consult_nudge": "Which door will open for your skill — your kundli holds it. Ask a pandit ji.",
+      "consult_nudge": "Which door will open for your skill — ask and know.",
       "prefill_question": "I got 'The Skilled Hand' card today — what does it mean for my career?"
     },
     {
@@ -335,11 +334,11 @@
       "art_key": "the_three_cups",
       "theme": "relationships",
       "fortune": [
-        "Good news in the family will bring people together.",
-        "This week a small celebration is on its way."
+        "Good news in the family is going to bring people together again.",
+        "This week a small celebration is already on its way to your door."
       ],
       "finding": "A happy occasion is forming around you. What it will be about is still to be seen.",
-      "consult_nudge": "What joy your stars are preparing — your kundli says it. Ask a pandit ji.",
+      "consult_nudge": "What joy is being prepared for you — ask and know.",
       "prefill_question": "I got 'The Three Cups' card today — what good news is coming?"
     }
   ]

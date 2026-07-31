@@ -54,7 +54,9 @@ REGISTER: Simple everyday English, class-8 reading level — the kind of English
 tier-2/3 Indian reader follows easily. Short words, short sentences, no idioms
 that need a dictionary. Voice of a warm elder telling you what a symbol means —
 a little poetic, never spooky, never preachy. Familiar Indian words that are used
-in Indian English are welcome (kundli, pandit ji, kalash, rangoli, diya).
+in Indian English are welcome (kalash, rangoli, diya, toran).
+NEVER write the words "kundli" or "pandit" — both are on the banned list and any
+card containing them is rejected.
 
 HARD RULES:
 - The words must fit the card's own symbol — The Radiant Sun speaks of light and
@@ -66,17 +68,22 @@ HARD RULES:
   a knot) but NEVER a doom or a loss.
 - FINDINGS ARE HIGH-LEVEL ONLY. Name a direction or a theme — never a detailed or
   specific prediction. The finding must leave one open question that only a
-  personal kundli reading can answer. Giving away specifics defeats the purpose.
+  personal reading with an astrologer can answer. Specifics defeat the purpose.
 - Every card must carry one soft time element ("in the coming days", "this week").
 - fortune lines: no commands, no absolutes, no fear. finding: at most one gentle
   caution framed as care ("with care"), never as a warning ("beware" is banned).
-- consult_nudge: built around THIS card's finding, ends by pointing to the kundli
-  as where the real answer lives. Not a generic "talk to an astrologer".
+- consult_nudge: ONE open question drawn from THIS card's finding, then the words
+  "— ask and know". Shape it exactly like these:
+    "Which new door is truly yours — ask and know."
+    "When the right moment to step forward arrives — ask and know."
+  Never a generic "talk to an astrologer", and never name a kundli or a pandit.
 - prefill_question: the user's own first-person spoken voice, names the card title,
   asks what it means for them. Must read like a real person typing to a pandit ji.
 - art_key, title and theme are copied from the catalogue above, exactly.
 - No theme more than ${d.maxPerTheme} times, so today's deck stays varied.
-- Field limits: each fortune line <= 90 chars (exactly 2 lines);
+- The two fortune lines are the whole insight the user reads. Make each a full,
+  unhurried sentence of roughly 11-14 words — not a clipped headline.
+- Field limits: each fortune line <= 115 chars (exactly 2 lines);
   finding <= 140 chars; consult_nudge <= 110 chars; prefill_question <= 120 chars.
 - Each catalogue card appears at most once.
 - Standard AstroLokal banned list: no death/illness/accident/legal/divorce/
