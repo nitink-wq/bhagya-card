@@ -129,7 +129,6 @@ export function loadConfig() {
   // its built-in placeholder art, keyed by the same art_key.
   raw.art = raw.art || { baseUrl: null, ext: 'png' };
   raw.astrologer = raw.astrologer || { name: null, avatarUrl: null };
-  raw.nav = raw.nav || { backDeeplink: null };
 
   if (!Array.isArray(raw.sampleDeck) || raw.sampleDeck.length < d.minSize) {
     throw new Error(`config: sampleDeck must hold at least ${d.minSize} cards`);

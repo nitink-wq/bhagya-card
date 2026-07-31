@@ -122,7 +122,6 @@ function buildSessionPayload({ cfg, day, cards, draw, streak }) {
     copy: cfg.copy,
     art: cfg.art,
     astrologer: cfg.astrologer,
-    nav: cfg.nav,
   };
 }
 

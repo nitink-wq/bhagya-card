@@ -882,12 +882,11 @@
   }
 
   // Back action, shared by the back arrow and the CTA: go back in webview
-  // history when there is any, otherwise hand control to the app shell via
-  // the deeplink (without it a first-page-in-webview tap would do nothing).
+  // history when there is any, otherwise close the window and let the app
+  // shell take over.
   function goBack() {
-    var deeplink = S && S.nav && S.nav.backDeeplink;
     if (history.length > 1) history.back();
-    else if (deeplink) location.href = deeplink;
+    else window.close();
   }
   el('backBtn').onclick = goBack;
   // Delegated: the CTA is re-rendered on every state change and exists twice
