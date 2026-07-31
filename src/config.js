@@ -48,6 +48,10 @@ export function validateCard(card, cfg, label) {
   const text = [card.title, ...card.fortune, card.finding, card.consult_nudge, card.prefill_question].join(' ');
   const hit = findBannedWord(cfg, text);
   if (hit) fail(`banned word "${hit}" in card text`);
+  // House style: no em or en dashes. Language models reach for them
+  // constantly, so this is a lint rather than a prompt line — the prompt asks,
+  // this guarantees.
+  if (/[—–]/.test(text)) fail('em/en dash in card text (use a full stop or a comma)');
 }
 
 // Word-boundary match for plain words; substring match for tokens with

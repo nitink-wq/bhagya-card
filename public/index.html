@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Today's Fortune Card — AstroLokal</title>
+<title>Today's Fortune Card | AstroLokal</title>
 <style>
   /* Self-hosted fonts — no third-party request on a slow connection.
      Lora for headings, Figtree for everything else. */
@@ -69,7 +69,7 @@
   .nav {
     display: grid; grid-template-columns: 38px 1fr 38px; align-items: center;
     padding-top: calc(18px + env(safe-area-inset-top));
-    padding-bottom: 16px;
+    padding-bottom: 26px;
   }
   .nav .back {
     width: 38px; height: 38px; flex: none; border: 0; cursor: pointer; border-radius: 50%;
@@ -78,13 +78,13 @@
   }
   .nav .back:active { background: var(--panel-deep); }
   .nav .back svg { width: 19px; height: 19px; }
-  .nav .brand { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .nav .brand { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .nav .brandRow { display: flex; align-items: center; gap: 6px; }
   .nav .sub {
-    font-size: 13px; font-weight: 600; letter-spacing: .01em;
+    font-size: 14.5px; font-weight: 600; letter-spacing: .01em;
     color: var(--gold-deep);
     /* reserve the line so the nav doesn't grow when the copy arrives */
-    min-height: 16px;
+    min-height: 18px;
   }
   /* logo.png carries ~10% transparent padding on every side; crop it away so
      the mark sits tight against the wordmark instead of floating off it */
@@ -765,6 +765,27 @@
     if (btn && !btn.disabled) btn.onclick = onClaim;
     scheduleRollover(s);
     watchCta(s);
+    if (opts.justDrawn) glideToInsight();
+  }
+
+  // After the draw, carry the user down to what the card actually says. The
+  // card has just flipped at the top of the page, so landing them on the
+  // insight (with the card still in frame above it) is the payoff; leaving
+  // them at the top makes the reading look like it never arrived.
+  function glideToInsight() {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function () {
+      var insight = document.querySelector('.story .insight');
+      if (!insight) return;
+      var rect = insight.getBoundingClientRect();
+      // Land the insight about a third down the viewport: high enough to read
+      // without scrolling, low enough that the card is still above it. Done
+      // unconditionally — on a tall phone the insight is technically on screen
+      // but pinned to the bottom edge, which is not a payoff.
+      var top = window.scrollY + rect.top - window.innerHeight * 0.32;
+      if (Math.abs(top - window.scrollY) < 24) return;   // already there
+      window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+    }, reduce ? 0 : 700);   // let the card finish dealing in first
   }
 
   function ctaHtml(s) {
@@ -844,7 +865,7 @@
 
   function render(s) {
     S = s;
-    document.title = s.copy.header.title + ' — AstroLokal';
+    document.title = s.copy.header.title + ' | AstroLokal';
     el('navSub').textContent = s.copy.header.subtitle || '';
     if (s.drawn) renderReveal(s, {});   // drawn state persists all day, across re-opens
     else renderFan(s);

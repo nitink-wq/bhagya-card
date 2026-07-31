@@ -73,12 +73,15 @@ HARD RULES:
 - fortune lines: no commands, no absolutes, no fear. finding: at most one gentle
   caution framed as care ("with care"), never as a warning ("beware" is banned).
 - consult_nudge: ONE open question drawn from THIS card's finding, then the words
-  "— ask and know". Shape it exactly like these:
-    "Which new door is truly yours — ask and know."
-    "When the right moment to step forward arrives — ask and know."
+  "Ask and know." Shape it exactly like these:
+    "Which new door is truly yours? Ask and know."
+    "When will the right moment to step forward arrive? Ask and know."
+  The question must be grammatical with normal question word order.
   Never a generic "talk to an astrologer", and never name a kundli or a pandit.
+- NEVER use an em dash or an en dash anywhere. Use a full stop or a comma
+  instead. Cards containing one are rejected.
 - prefill_question: the user's own first-person spoken voice, names the card title,
-  asks what it means for them. Must read like a real person typing to a pandit ji.
+  asks what it means for them. Must read like a real person typing to an astrologer.
 - art_key, title and theme are copied from the catalogue above, exactly.
 - No theme more than ${d.maxPerTheme} times, so today's deck stays varied.
 - The two fortune lines are the whole insight the user reads. Make each a full,

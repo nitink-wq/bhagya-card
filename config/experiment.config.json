@@ -185,7 +185,7 @@
     "consult": {
       "cta": "Talk to an Astrologer"
     },
-    "postStreak": "You have collected all your rewards. Keep drawing a card each day — your sign for the day will always be here.",
+    "postStreak": "You have collected all your rewards. Keep drawing a card each day, and your sign for the day will always be here.",
     "blocked": {
       "title": "Please log in",
       "body": "Log in to the AstroLokal app and open Bhagya Card again to see today's card."
@@ -206,8 +206,8 @@
         "In the coming days your energy will feel new again, and lighter."
       ],
       "finding": "Your strength is returning. Where to spend it first is the one thing this card leaves open.",
-      "consult_nudge": "Which work truly deserves this new energy — ask and know.",
-      "prefill_question": "I got 'The Radiant Sun' card today — what does it mean for me?"
+      "consult_nudge": "Which work truly deserves this new energy? Ask and know.",
+      "prefill_question": "I got 'The Radiant Sun' card today. What does it mean for me?"
     },
     {
       "title": "The Guiding Star",
@@ -218,8 +218,8 @@
         "The way ahead is being lit for you, gently, one small step at a time."
       ],
       "finding": "Hope is coming back to you. Which hope is worth walking towards is still to be understood.",
-      "consult_nudge": "Which hope is truly worth walking towards — ask and know.",
-      "prefill_question": "I got 'The Guiding Star' card today — what does it mean for my future?"
+      "consult_nudge": "Which hope is truly worth walking towards? Ask and know.",
+      "prefill_question": "I got 'The Guiding Star' card today. What does it mean for my future?"
     },
     {
       "title": "The Turning Wheel",
@@ -230,8 +230,8 @@
         "What you started long back will begin to move once more this week."
       ],
       "finding": "Your time is turning in your favour. How far this turn takes you is still to be read.",
-      "consult_nudge": "How far this turning time will carry you — ask and know.",
-      "prefill_question": "I got 'The Turning Wheel' card today — how will my coming time be?"
+      "consult_nudge": "How far will this turning time carry you? Ask and know.",
+      "prefill_question": "I got 'The Turning Wheel' card today. How will my coming time be?"
     },
     {
       "title": "The Golden Chariot",
@@ -241,9 +241,9 @@
         "A journey or a change of place is quietly taking shape around you.",
         "The reins are in your own hands this week, more than you realise."
       ],
-      "finding": "Movement is coming — a trip, a move, or a change. Which direction is right is still open.",
-      "consult_nudge": "Which direction is truly yours to take — ask and know.",
-      "prefill_question": "I got 'The Golden Chariot' card today — what does it mean for travel?"
+      "finding": "Movement is coming: a trip, a move, or a change. Which direction is right is still open.",
+      "consult_nudge": "Which direction is truly yours to take? Ask and know.",
+      "prefill_question": "I got 'The Golden Chariot' card today. What does it mean for travel?"
     },
     {
       "title": "The Whole World",
@@ -254,8 +254,8 @@
         "This week your work will reach good people you have never met."
       ],
       "finding": "Your world is quietly growing bigger. Which new door matters most is still to be read.",
-      "consult_nudge": "Which new door is truly yours — ask and know.",
-      "prefill_question": "I got 'The Whole World' card today — what new chance is coming to me?"
+      "consult_nudge": "Which new door is truly yours? Ask and know.",
+      "prefill_question": "I got 'The Whole World' card today. What new chance is coming to me?"
     },
     {
       "title": "The Open Road",
@@ -266,8 +266,8 @@
         "One clear step ahead will show itself to you in the coming days."
       ],
       "finding": "A way forward is opening for you. Whether to step now or wait a little is the open question.",
-      "consult_nudge": "When the right moment to step forward arrives — ask and know.",
-      "prefill_question": "I got 'The Open Road' card today — is this the right time to move ahead?"
+      "consult_nudge": "When will the right moment to step forward arrive? Ask and know.",
+      "prefill_question": "I got 'The Open Road' card today. Is this the right time to move ahead?"
     },
     {
       "title": "The Golden Empress",
@@ -278,8 +278,8 @@
         "In the coming days money matters will begin to feel lighter."
       ],
       "finding": "Abundance is gathering around you. Where to let it flow first is what this card leaves open.",
-      "consult_nudge": "Where what you have will grow the best — ask and know.",
-      "prefill_question": "I got 'The Golden Empress' card today — what does it mean for my money?"
+      "consult_nudge": "Where will your savings grow best? Ask and know.",
+      "prefill_question": "I got 'The Golden Empress' card today. What does it mean for my money?"
     },
     {
       "title": "The Full Home",
@@ -290,8 +290,8 @@
         "This week your house will feel fuller and warmer than it has in a while."
       ],
       "finding": "The house is moving towards peace. Who takes the first step is what this card leaves open.",
-      "consult_nudge": "Who should make the first move at home — ask and know.",
-      "prefill_question": "I got 'The Full Home' card today — what does it mean for my family?"
+      "consult_nudge": "Who should make the first move at home? Ask and know.",
+      "prefill_question": "I got 'The Full Home' card today. What does it mean for my family?"
     },
     {
       "title": "The Festive Gate",
@@ -299,11 +299,11 @@
       "theme": "home",
       "fortune": [
         "A happy occasion is quietly preparing to enter your home again.",
-        "Keep the doorway ready — good news is already walking towards it."
+        "Keep the doorway ready, because good news is already walking towards it."
       ],
       "finding": "Something worth celebrating is forming near your family. What shape it takes is still to be seen.",
-      "consult_nudge": "What your home is truly being prepared for — ask and know.",
-      "prefill_question": "I got 'The Festive Gate' card today — what good news is coming home?"
+      "consult_nudge": "What is your home truly being prepared for? Ask and know.",
+      "prefill_question": "I got 'The Festive Gate' card today. What good news is coming home?"
     },
     {
       "title": "The Steady Emperor",
@@ -314,8 +314,8 @@
         "In the coming days your word will carry real weight where it matters."
       ],
       "finding": "Your standing at work is rising quietly. Where to use that voice is the open question.",
-      "consult_nudge": "When your voice will count the most — ask and know.",
-      "prefill_question": "I got 'The Steady Emperor' card today — what does it mean for my work?"
+      "consult_nudge": "When will your voice count the most? Ask and know.",
+      "prefill_question": "I got 'The Steady Emperor' card today. What does it mean for my work?"
     },
     {
       "title": "The Skilled Hand",
@@ -326,8 +326,8 @@
         "One more honest round of effort and the result will begin to show."
       ],
       "finding": "Your craft is nearly ready to be seen. Which door to knock on first is still to be understood.",
-      "consult_nudge": "Which door will open for your skill — ask and know.",
-      "prefill_question": "I got 'The Skilled Hand' card today — what does it mean for my career?"
+      "consult_nudge": "Which door will open for your skill? Ask and know.",
+      "prefill_question": "I got 'The Skilled Hand' card today. What does it mean for my career?"
     },
     {
       "title": "The Three Cups",
@@ -338,8 +338,8 @@
         "This week a small celebration is already on its way to your door."
       ],
       "finding": "A happy occasion is forming around you. What it will be about is still to be seen.",
-      "consult_nudge": "What joy is being prepared for you — ask and know.",
-      "prefill_question": "I got 'The Three Cups' card today — what good news is coming?"
+      "consult_nudge": "What joy is being prepared for you? Ask and know.",
+      "prefill_question": "I got 'The Three Cups' card today. What good news is coming?"
     }
   ]
 }
