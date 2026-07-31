@@ -881,12 +881,25 @@
       .catch(function (err) { renderError(err.copy); });
   }
 
-  // Back action, shared by the back arrow and the CTA: go back in webview
-  // history when there is any, otherwise close the window and let the app
-  // shell take over.
+  // Back action, shared by the back arrow and the CTA. This page opens inside
+  // the app's webview with no history of its own, so "back" means "app shell,
+  // close this webview" — the shell returning to whatever screen opened it is
+  // what sends the user back where they came from. Channels, in order:
+  //   1. In-page history, if the user did navigate within the webview.
+  //   2. A JS bridge the app may inject (bridge.close() / closeWebview()).
+  //   3. The configurable back deeplink, which the app shell intercepts.
+  //   4. window.close(), for the plain-browser case.
   function goBack() {
-    if (history.length > 1) history.back();
-    else window.close();
+    if (history.length > 1) { history.back(); return; }
+    var bridge = window.AstroLokal || window.AndroidBridge || window.Android;
+    if (bridge) {
+      if (typeof bridge.close === 'function') { bridge.close(); return; }
+      if (typeof bridge.closeWebview === 'function') { bridge.closeWebview(); return; }
+      if (typeof bridge.goBack === 'function') { bridge.goBack(); return; }
+    }
+    var deeplink = S && S.nav && S.nav.backDeeplink;
+    if (deeplink) { location.href = deeplink; return; }
+    window.close();
   }
   el('backBtn').onclick = goBack;
   // Delegated: the CTA is re-rendered on every state change and exists twice

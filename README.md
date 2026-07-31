@@ -195,12 +195,15 @@ Art is never generated: a card's `art_key` indexes the fixed illustration set.
 
 ## In-app webview
 
-- **Back:** the top-left back button calls `history.back()` when the webview
-  has history, otherwise it fires `nav.backDeeplink` (config, default
-  `astrolokal://home`) so the app shell takes the user back to where they
-  came from. "Talk to an Astrologer" is the consult deeplink
-  (`astrolokal://consult/chat?src=…&day=…&card=…&prefill=…`) — the app's own
-  navigation handles the return.
+- **Back:** the top-left back button and the "Talk to an Astrologer" CTA
+  both perform the same back action. The page runs in the app's webview
+  with no history of its own, so the cascade is: in-page history if any →
+  an app-injected JS bridge (`close()` / `closeWebview()` / `goBack()` on
+  `window.AstroLokal`, `window.AndroidBridge` or `window.Android`) →
+  `nav.backDeeplink` (config, default `astrolokal://home`), which the app
+  shell must intercept and close the webview — returning the user to
+  whichever screen opened it → `window.close()` for plain browsers. The
+  consult deeplink is no longer navigated to.
 - **Safe areas:** `viewport-fit=cover` + `env(safe-area-inset-top)` on the
   nav and `env(safe-area-inset-bottom)` on both the page bottom and the
   sticky CTA bar, so notches, the iOS home indicator, and Android

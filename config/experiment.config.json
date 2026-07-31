@@ -138,6 +138,10 @@
   "consultTarget": {
     "deeplink": "astrolokal://consult/chat"
   },
+  "nav": {
+    "comment": "The page lives in the app's webview with no history, so the back arrow and the CTA navigate to this deeplink. The app shell must intercept it and close the webview, which returns the user to whichever screen opened it. Point it at whatever URL your shell maps to 'close this webview'.",
+    "backDeeplink": "astrolokal://home"
+  },
   "art": {
     "comment": "The 12 real illustrations live in public/art/{art_key}.jpg (704x1056, q82 — resized from the 1024x1536 masters), served by the app itself (baseUrl 'art' is relative). Point baseUrl at a CDN instead to serve them from elsewhere. If a file is missing the client falls back to its inline placeholder emblem.",
     "baseUrl": "art",
