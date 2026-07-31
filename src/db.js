@@ -42,8 +42,15 @@ export async function withTx(fn) {
   }
 }
 
+// Readiness = "can this pod actually serve a request", which is more than
+// "the database answers". A reachable but unmigrated database used to pass
+// this check, so Kubernetes routed traffic to a pod that 500ed on every
+// call; the schema check turns that silent failure into an unready pod.
 export async function healthcheck() {
-  await pool.query('SELECT 1');
+  const { rows } = await pool.query("SELECT to_regclass('public.deck_days') AS t");
+  if (!rows[0].t) {
+    throw new Error('schema missing — run `npm run migrate:up` (deploy-time migration job)');
+  }
 }
 
 export async function closePool() {

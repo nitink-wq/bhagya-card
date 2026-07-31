@@ -245,8 +245,12 @@ the client never submits an amount, and credentials/URL live only in env
 
 ## Verification checklist
 
-- [ ] `/readyz` ok; with no `user_id` the page shows the "Please log in"
-      card (no retry button — retrying without an identity cannot succeed).
+- [ ] `/readyz` ok. If it 503s with `"reason": "schema missing"`, the
+      migration job has not run — `npm run migrate:up` in the pod terminal.
+      (`/healthz` deliberately stays 200 so k8s keeps the pod alive and
+      shell-able while it is unready.)
+- [ ] With no `user_id` the page shows the "Please log in" card (no retry
+      button — retrying without an identity cannot succeed).
 - [ ] Draw → card revealed + 10 coins on day 1; re-open shows the same card
       (seeded + persisted); second draw request returns `alreadyDrawn`.
 - [ ] Claim pays once; double-tap → `alreadyClaimed: true`, no second credit;

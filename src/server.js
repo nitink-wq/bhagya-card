@@ -22,8 +22,12 @@ app.get('/readyz', async (req, res) => {
   try {
     await healthcheck();
     res.json({ ok: true });
-  } catch {
-    res.status(503).json({ ok: false });
+  } catch (err) {
+    // Surface *why* we are not ready — the first deploy of a new environment
+    // fails here until the migration job has run, and a bare 503 sends people
+    // hunting through pod logs to find that out.
+    console.error('[readyz] not ready:', err.message);
+    res.status(503).json({ ok: false, reason: err.message });
   }
 });
 
