@@ -46,7 +46,7 @@ export async function fireCoinCredit({ userId, day, amount, idempotencyKey }) {
     {
       userId: /^\d+$/.test(userId) ? Number(userId) : userId,
       amount: amount.toFixed(2),
-      purpose: tx.purpose || 'refund',
+      purpose: tx.purpose || 'reward',
       description: (tx.descriptionTemplate || 'Bhagya Card reward {day}').replace('{day}', day),
       source: tx.source || 'bhagya_card',
     },
