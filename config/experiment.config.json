@@ -154,7 +154,7 @@
   },
   "coinCredit": {
     "purpose": "reward",
-    "descriptionTemplate": "Bhagya Card streak reward {day}",
+    "descriptionTemplate": "Retention experiment",
     "source": "bhagya_card"
   },
   "copy": {
