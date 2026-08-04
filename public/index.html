@@ -413,7 +413,28 @@
   'use strict';
 
   var USER_ID = new URLSearchParams(location.search).get('user_id') || '';
-  var API = { session: '/api/session', draw: '/api/draw', claim: '/api/claim' };
+  var API = { session: '/api/session', draw: '/api/draw', claim: '/api/claim', events: '/api/events' };
+
+  // Fire-and-forget analytics. sendBeacon survives the page being torn down
+  // (back / consult hand control to the app immediately after the tap);
+  // keepalive fetch is the fallback. A lost event must never break the page.
+  function track(event, coins) {
+    if (!USER_ID) return;
+    var payload = JSON.stringify({
+      user_id: USER_ID, event: event, ts: new Date().toISOString(),
+      coins: typeof coins === 'number' ? coins : undefined
+    });
+    try {
+      if (navigator.sendBeacon &&
+          navigator.sendBeacon(API.events, new Blob([payload], { type: 'application/json' }))) return;
+    } catch (e) { /* fall through to fetch */ }
+    try {
+      fetch(API.events, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: payload, keepalive: true
+      }).catch(function () {});
+    } catch (e) { /* analytics never breaks the page */ }
+  }
   // Only used when the network itself fails and server copy never arrived.
   var NET_COPY = { title: 'No internet', body: 'Please check your connection and try again.', retry: 'Try again' };
 
@@ -680,6 +701,7 @@
   }
 
   function onPick(pick, node) {
+    track('card_draw');
     el('fan').classList.add('picked');
     node.classList.add('chosen');
     var req = api(API.draw, {
@@ -819,6 +841,7 @@
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ user_id: USER_ID })
     }).then(function (out) {
+      track('claim', out.claimedAmount);
       // Celebrate on the live DOM first, then re-render — by then the session
       // says claimed, so the row is simply absent instead of snapping shut.
       S = out.session;
@@ -896,15 +919,16 @@
     if (deeplink) location.href = deeplink;
     else history.back();
   }
-  el('backBtn').onclick = goBack;
+  el('backBtn').onclick = function () { track('back_click'); goBack(); };
   // Delegated: the CTA is re-rendered on every state change and exists twice
   // (inline + sticky bar), so one listener on the document covers them all.
   document.addEventListener('click', function (e) {
     var t = e.target;
     while (t && t !== document && !(t.classList && t.classList.contains('cta'))) t = t.parentNode;
-    if (t && t !== document) { e.preventDefault(); goBack(); }
+    if (t && t !== document) { e.preventDefault(); track('consult_click'); goBack(); }
   });
 
+  track('page_view');
   load();
 })();
 </script>

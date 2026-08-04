@@ -4,7 +4,7 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadConfig } from './config.js';
-import { healthcheck, closePool } from './db.js';
+import { query, healthcheck, closePool } from './db.js';
 import { ensureDeckForToday, ensureUpcomingDeck } from './pool.js';
 import { getSession, draw, claim, isValidUserId, StateError } from './state.js';
 
@@ -97,6 +97,31 @@ app.post('/api/claim', async (req, res) => {
     res.json(await claim(userId));
   } catch (err) {
     sendError(res, err);
+  }
+});
+
+// Analytics: append-only, fire-and-forget. The client uses sendBeacon so the
+// event survives the page being torn down (back / consult leave immediately);
+// a lost event must never break the product, hence the swallowed errors.
+const TRACKED_EVENTS = new Set(['page_view', 'card_draw', 'back_click', 'claim', 'consult_click']);
+app.post('/api/events', async (req, res) => {
+  try {
+    const userId = requireUser(req);
+    const { event, coins, ts } = req.body || {};
+    if (!TRACKED_EVENTS.has(event)) {
+      return res.status(400).json({ error: 'UNKNOWN_EVENT' });
+    }
+    const clientTime = ts && !Number.isNaN(Date.parse(ts)) ? new Date(ts) : null;
+    const coinsInt = Number.isInteger(coins) && coins > 0 ? coins : null;
+    await query(
+      'INSERT INTO events (user_id, event, coins, client_time) VALUES ($1, $2, $3, $4)',
+      [userId, event, coinsInt, clientTime],
+    );
+    res.status(204).end();
+  } catch (err) {
+    if (err instanceof StateError) return sendError(res, err);
+    console.error('[events] insert failed:', err.message);
+    res.status(204).end(); // analytics never surfaces errors to the user
   }
 });
 
