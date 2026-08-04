@@ -882,10 +882,16 @@
   }
 
   // Back action, shared by the back arrow and the CTA. This page opens inside
-  // the app's webview, which keeps no usable history, so "back" means firing
-  // the deeplink: the app intercepts it and returns the user to where they
-  // came from. history.back() is only a fallback for plain-browser testing.
+  // the app's React Native webview: post GO_BACK to the shell so it POPS this
+  // screen off the navigation stack. (Navigating to the Home deeplink instead
+  // PUSHES a new Home on top, so the phone's back button would land the user
+  // right back here.) The deeplink and history.back() remain as fallbacks for
+  // app builds without the bridge and for plain-browser testing.
   function goBack() {
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ action: 'GO_BACK' }));
+      return;
+    }
     var deeplink = S && S.nav && S.nav.backDeeplink;
     if (deeplink) location.href = deeplink;
     else history.back();
