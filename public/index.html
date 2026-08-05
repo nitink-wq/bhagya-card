@@ -820,15 +820,18 @@
   }
 
   // The CTA lives at the end of the story. The fixed bar is the same button
-  // re-offered once that one scrolls out of sight — never two at once.
+  // re-offered while that one is not usefully on screen — never two at once.
+  // "Usefully" means mostly visible: a few-pixel sliver peeking at the bottom
+  // edge (common on Android, where the nav bar shaves the viewport) used to
+  // count as visible and hide the sticky bar, so the button got missed.
   function watchCta(s) {
     if (ctaWatch) { ctaWatch.disconnect(); ctaWatch = null; }
     el('ctaBar').innerHTML = ctaHtml(s);
     var inline = el('inlineCta');
-    if (!inline || !window.IntersectionObserver) return;
+    if (!inline || !window.IntersectionObserver) { showCtaBar(true); return; }
     ctaWatch = new IntersectionObserver(function (entries) {
-      showCtaBar(!entries[0].isIntersecting);
-    }, { threshold: 0 });
+      showCtaBar(entries[0].intersectionRatio < 0.65);
+    }, { threshold: [0, 0.65, 1] });
     ctaWatch.observe(inline);
   }
   function showCtaBar(on) { el('ctaBar').classList.toggle('show', Boolean(on)); }

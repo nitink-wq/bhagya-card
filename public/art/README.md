@@ -21,11 +21,12 @@ the source; `art.ext: "jpg"` picks the extension).
 
 ## Encoding
 
-Shipped as **704 × 1056 JPEG, quality 82** (~285–410 KB each), resized from
-the 1024 × 1536 PNG masters (~3 MB each). The card renders at 204 × 316 CSS
-px, so 704 px wide still covers a 3× display with headroom, and JPEG is the
-right format for painterly art — the PNG masters were ~10× larger for no
-visible gain at this size.
+Shipped as **480 × 720 JPEG, quality 68** (~110–155 KB each), resized from
+the 1024 × 1536 PNG masters (~3 MB each). The card renders at 186 × 288 CSS
+px, so 480 px wide covers a ~2.6× display — sharp on the mid-range Androids
+this experiment targets, and small enough that the one image a 3G user
+downloads arrives in a second or two. JPEG is the right format for painterly
+art — the PNG masters were ~20× larger for no visible gain at this size.
 
 Only **one** image ever loads per user per day (they draw one card), so the
 deck's size on disk is never a page-weight cost.
@@ -34,7 +35,7 @@ Regenerate from the masters with:
 
 ```bash
 for f in /path/to/masters/*.png; do
-  sips -s format jpeg -s formatOptions 82 -Z 1056 "$f" \
+  sips -s format jpeg -s formatOptions 68 --resampleWidth 480 "$f" \
     --out "public/art/$(basename "$f" .png).jpg"
 done
 ```
